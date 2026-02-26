@@ -1,0 +1,208 @@
+generator client {
+  provider        = "prisma-client-js"
+previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [vector]
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String
+  name           String?
+  role           UserRole  @default(USER)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastActiveAt   DateTime?
+
+  agencyProfile  AgencyProfile?
+  clients        Client[]
+  conversations  Conversation[]
+  gptMemory      GptMemory[]
+  passwordResets PasswordReset[]
+  usageLogs      UsageLog[]
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model AgencyProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id])
+
+  niche            String?
+  services         String[]
+  location         String?
+  monthlyRevenue   String?
+  revenueGoal      String?
+  experienceLevel  String?
+  background       String?
+  biggestChallenge String?
+
+  completedAt      DateTime?
+  updatedAt        DateTime  @updatedAt
+}
+
+model Client {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+
+  businessName  String
+  website       String?
+  industry      String?
+  status        ClientStatus @default(PROSPECT)
+  notes         String?
+  contactName   String?
+  contactEmail  String?
+
+  conversations Conversation[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+enum ClientStatus {
+  PROSPECT
+  ACTIVE
+  CHURNED
+  PAUSED
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  clientId  String?
+  client    Client?   @relation(fields: [clientId], references: [id])
+
+  gptSlug   String
+  title     String?
+  messages  Message[]
+  summary   String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  role           MessageRole
+  content        String
+  attachments    Attachment[]
+  tokensUsed     Int?
+
+  createdAt      DateTime     @default(now())
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model Attachment {
+  id            String         @id @default(cuid())
+  messageId     String
+  message       Message        @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  type          AttachmentType
+  fileName      String
+  fileSize      Int
+  extractedText String
+  storagePath   String
+
+  createdAt     DateTime       @default(now())
+}
+
+enum AttachmentType {
+  PDF
+  VOICE_NOTE
+  DOCUMENT
+  TEXT
+}
+
+model GptMemory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  gptSlug   String
+  memoryBlob String
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, gptSlug])
+}
+
+model GptConfig {
+  id              String             @id @default(cuid())
+  gptSlug         String             @unique
+  systemPrompt    String
+  isActive        Boolean            @default(true)
+  modelOverride   String?
+  temperature     Float?
+  badge           String?
+  suggestedPrompts String[]
+  updatedAt       DateTime           @updatedAt
+  promptVersions  PromptVersion[]
+  knowledgeDocs   KnowledgeDocument[]
+}
+
+model PromptVersion {
+  id        String    @id @default(cuid())
+  gptSlug   String
+  gptConfig GptConfig @relation(fields: [gptSlug], references: [gptSlug])
+  prompt    String
+  savedAt   DateTime  @default(now())
+}
+
+model KnowledgeDocument {
+  id         String           @id @default(cuid())
+  gptSlug    String
+  gptConfig  GptConfig        @relation(fields: [gptSlug], references: [gptSlug])
+  name       String
+  content    String
+  chunks     KnowledgeChunk[]
+  uploadedAt DateTime         @default(now())
+}
+
+model KnowledgeChunk {
+  id         String            @id @default(cuid())
+  documentId String
+  document   KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  content    String
+  embedding  Unsupported("vector(1536)")
+  chunkIndex Int
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model UsageLog {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  gptSlug       String
+  provider      String
+  model         String
+  tokensInput   Int
+  tokensOutput  Int
+  estimatedCost Float
+  createdAt     DateTime @default(now())
+}
