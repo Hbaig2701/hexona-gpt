@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
       },
     },
     csrfToken: {
-      name: "__Host-next-auth.csrf-token",
+      name: "__Secure-next-auth.csrf-token",
       options: {
         sameSite: "none" as const,
         secure: true,
