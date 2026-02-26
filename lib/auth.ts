@@ -55,7 +55,25 @@ export const authOptions: NextAuthOptions = {
   },
   cookies: {
     sessionToken: {
-      name: "next-auth.session-token",
+      name: "__Secure-next-auth.session-token",
+      options: {
+        sameSite: "none" as const,
+        secure: true,
+        httpOnly: true,
+        path: "/",
+      },
+    },
+    csrfToken: {
+      name: "__Host-next-auth.csrf-token",
+      options: {
+        sameSite: "none" as const,
+        secure: true,
+        httpOnly: true,
+        path: "/",
+      },
+    },
+    callbackUrl: {
+      name: "__Secure-next-auth.callback-url",
       options: {
         sameSite: "none" as const,
         secure: true,
