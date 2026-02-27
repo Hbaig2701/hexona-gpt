@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 import OnboardingChat from "@/components/onboarding/OnboardingChat";
@@ -22,7 +22,9 @@ interface AgencyData {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>("welcome");
+  const searchParams = useSearchParams();
+  const resuming = searchParams.get("resume") === "1";
+  const [step, setStep] = useState<Step>(resuming ? "interview" : "welcome");
   const [agencyData, setAgencyData] = useState<AgencyData>({
     niche: "",
     services: [],

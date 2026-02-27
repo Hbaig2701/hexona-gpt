@@ -26,19 +26,47 @@ interface OnboardingChatProps {
   onEarlyExit: () => void;
 }
 
+const INITIAL_MESSAGE: Message = {
+  role: "assistant",
+  content:
+    "Hey! I'm here to learn about your agency so we can personalize all your AI tools. Let's start — what services do you offer or want to offer? (e.g., AI voice agents, CRM automation, chatbots, etc.)",
+};
+
 export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingChatProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content:
-        "Hey! I'm here to learn about your agency so we can personalize all your AI tools. Let's start — what services do you offer or want to offer? (e.g., AI voice agents, CRM automation, chatbots, etc.)",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Resume existing onboarding conversation if one exists
+  useEffect(() => {
+    fetch("/api/conversations?gptSlug=agency-onboarding&limit=1")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0 && data[0]._count?.messages > 0) {
+          const convId = data[0].id;
+          setConversationId(convId);
+          // Load existing messages
+          fetch(`/api/conversations/${convId}`)
+            .then((r) => r.json())
+            .then((convData) => {
+              if (convData.messages && convData.messages.length > 0) {
+                const loaded = convData.messages.map(
+                  (m: { role: string; content: string }) => ({
+                    role: m.role === "USER" ? "user" : "assistant",
+                    content: m.content,
+                  })
+                ) as Message[];
+                setMessages(loaded);
+              }
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Smooth streaming buffer
   const streamBufferRef = useRef("");

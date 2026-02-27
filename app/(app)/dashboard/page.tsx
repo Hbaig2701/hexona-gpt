@@ -97,7 +97,7 @@ export default function DashboardPage() {
 
       {/* Suggested Action */}
       {!profile?.completedAt && (
-        <Link href="/onboarding">
+        <Link href="/onboarding?resume=1">
           <Card className="border-hex-teal/30 hover:border-hex-teal/50 cursor-pointer !p-6">
             <div className="flex items-center gap-5">
               <div className="w-12 h-12 rounded-xl bg-hex-teal/15 flex items-center justify-center shrink-0">
