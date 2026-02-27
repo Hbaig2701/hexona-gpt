@@ -64,7 +64,7 @@ export default function DashboardPage() {
           </span>
           .
         </h1>
-        <p className="text-[var(--hex-text-secondary)] mt-2 text-base">
+        <p className="text-[var(--hex-text-secondary)] mt-3 text-base">
           Here&apos;s your agency command center.
         </p>
       </motion.div>
