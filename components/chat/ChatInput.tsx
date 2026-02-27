@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send, Paperclip, X } from "lucide-react";
 
 interface AttachmentData {
@@ -26,6 +26,19 @@ export default function ChatInput({ onSend, loading }: ChatInputProps) {
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Autofocus on mount
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
+
+  // Re-focus after response finishes generating
+  useEffect(() => {
+    if (!loading) {
+      textareaRef.current?.focus();
+    }
+  }, [loading]);
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -157,6 +170,7 @@ export default function ChatInput({ onSend, loading }: ChatInputProps) {
 
         {/* Text input */}
         <textarea
+          ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -164,7 +178,6 @@ export default function ChatInput({ onSend, loading }: ChatInputProps) {
           rows={1}
           className="flex-1 px-4 py-3 bg-[var(--hex-dark-600)] border border-[var(--hex-dark-500)] rounded-lg text-[var(--hex-text-primary)] placeholder:text-[var(--hex-text-muted)] focus:outline-none focus:border-hex-teal transition-colors resize-none max-h-32"
           style={{ minHeight: "44px" }}
-          disabled={loading}
         />
 
         {/* Send button */}
