@@ -9,7 +9,7 @@ import {
 
 interface AnalyticsData {
   dailyData: { date: string; messages: number; cost: number }[];
-  gptPopularity: { gptSlug: string; count: number }[];
+  gptPopularity: { gptSlug: string; count: number; cost: number }[];
   modelBreakdown: { provider: string; model: string; count: number; tokensInput: number; tokensOutput: number; cost: number }[];
   topUsers: { userId: string; name: string; email: string; messageCount: number; cost: number }[];
 }
@@ -139,6 +139,36 @@ export default function AdminAnalyticsPage() {
           </ResponsiveContainer>
         </Card>
       </div>
+
+      {/* Cost by GPT Table */}
+      <Card hoverable={false}>
+        <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-4">Cost by GPT</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-hex-dark-500">
+                <th className="text-left py-2 text-hex-text-muted font-medium">GPT</th>
+                <th className="text-right py-2 text-hex-text-muted font-medium">Messages</th>
+                <th className="text-right py-2 text-hex-text-muted font-medium">Est. Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.gptPopularity.map((g) => (
+                <tr key={g.gptSlug} className="border-b border-hex-dark-500/50">
+                  <td className="py-2 text-hex-text-primary">{g.gptSlug}</td>
+                  <td className="py-2 text-hex-text-primary text-right">{g.count.toLocaleString()}</td>
+                  <td className="py-2 text-hex-text-primary text-right">${g.cost.toFixed(2)}</td>
+                </tr>
+              ))}
+              <tr className="font-semibold">
+                <td className="py-2 text-hex-text-primary">Total</td>
+                <td className="py-2 text-hex-text-primary text-right">{data.gptPopularity.reduce((s, g) => s + g.count, 0).toLocaleString()}</td>
+                <td className="py-2 text-hex-teal text-right">${data.gptPopularity.reduce((s, g) => s + g.cost, 0).toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       {/* Top Users Table */}
       <Card hoverable={false}>

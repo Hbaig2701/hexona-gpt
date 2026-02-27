@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
       by: ["gptSlug"],
       where: { createdAt: { gte: since } },
       _count: true,
+      _sum: { estimatedCost: true },
       orderBy: { _count: { gptSlug: "desc" } },
     }),
     // Model cost breakdown
@@ -100,6 +101,7 @@ export async function GET(req: NextRequest) {
     gptPopularity: gptPopularity.map((g) => ({
       gptSlug: g.gptSlug,
       count: g._count,
+      cost: g._sum.estimatedCost || 0,
     })),
     modelBreakdown: modelBreakdown.map((m) => ({
       provider: m.provider,
