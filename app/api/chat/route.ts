@@ -101,31 +101,48 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Load conversation history with token-aware truncation
-  const historyMessages = await prisma.message.findMany({
-    where: { conversationId: convId },
-    orderBy: { createdAt: "desc" },
-    take: 30, // fetch more than needed, then truncate by token estimate
-  });
+  // Load conversation history using sliding window + summary for older context.
+  // Keep the last 10 messages verbatim. If the conversation is longer, prepend
+  // the conversation summary so the model retains full context without blowing
+  // through token limits.
+  const RECENT_MESSAGE_COUNT = 10;
+
+  const [recentMessages, totalMessageCount, conversation] = await Promise.all([
+    prisma.message.findMany({
+      where: { conversationId: convId },
+      orderBy: { createdAt: "desc" },
+      take: RECENT_MESSAGE_COUNT,
+    }),
+    prisma.message.count({ where: { conversationId: convId } }),
+    prisma.conversation.findUnique({
+      where: { id: convId },
+      select: { summary: true },
+    }),
+  ]);
 
   // Reverse to chronological order
-  historyMessages.reverse();
+  recentMessages.reverse();
 
-  // Truncate to fit within ~6000 tokens (rough estimate: 1 token ≈ 4 chars)
-  const MAX_HISTORY_CHARS = 24000;
-  let totalChars = 0;
-  const truncatedMessages: typeof historyMessages = [];
-  for (let i = historyMessages.length - 1; i >= 0; i--) {
-    const msgChars = historyMessages[i].content.length;
-    if (totalChars + msgChars > MAX_HISTORY_CHARS && truncatedMessages.length > 0) break;
-    totalChars += msgChars;
-    truncatedMessages.unshift(historyMessages[i]);
+  const chatMessages: { role: "user" | "assistant"; content: string }[] = [];
+
+  // If there are older messages beyond our window, inject the summary as context
+  if (totalMessageCount > RECENT_MESSAGE_COUNT && conversation?.summary) {
+    chatMessages.push({
+      role: "user",
+      content: `[Earlier conversation summary: ${conversation.summary}]`,
+    });
+    chatMessages.push({
+      role: "assistant",
+      content: "Understood, I have the context from our earlier conversation. Let's continue.",
+    });
   }
 
-  const chatMessages = truncatedMessages.map((m) => ({
-    role: (m.role === "USER" ? "user" : "assistant") as "user" | "assistant",
-    content: m.content,
-  }));
+  chatMessages.push(
+    ...recentMessages.map((m) => ({
+      role: (m.role === "USER" ? "user" : "assistant") as "user" | "assistant",
+      content: m.content,
+    }))
+  );
 
   // Replace last user message with the one that has attachments
   if (attachments?.length && chatMessages.length > 0) {
@@ -198,8 +215,9 @@ export async function POST(req: NextRequest) {
               generateTitle(convId, message, fullResponse).catch(console.error);
             }
 
-            // Memory summarization check (every 5 messages)
-            if (messageCount > 0 && messageCount % 5 === 0) {
+            // Memory summarization: keep summary fresh so sliding window always
+            // has context. Summarize after every 4 messages (2 exchanges).
+            if (messageCount >= 4 && messageCount % 4 === 0) {
               triggerMemorySummarization(session.user.id, gptSlug, convId).catch(console.error);
             }
 
