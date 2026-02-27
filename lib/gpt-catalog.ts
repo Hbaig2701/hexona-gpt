@@ -35,10 +35,10 @@ export const GPT_CATALOG: GPT[] = [
     badge: "popular",
     relatedGpts: ["sales", "pricing"],
     guide: [
-      "Provide your background, strengths, and location for personalized niche recommendations",
-      "Share the prospect's website URL for the most accurate pre-call research",
-      "Ask for competitor analysis in a specific city or region",
-      "Load a client contact first for instant research without re-entering details",
+      "Use it in two ways: niche selection (share your strengths, background, and location) or prospect research (share a business name/website)",
+      "Always include the prospect's city or region — location matters for competitor analysis",
+      "If you have a client contact loaded, it skips the intake questions and goes straight to research",
+      "Great before discovery calls — gives you company overview, pain points, competitors, and conversation starters",
     ],
   },
 
@@ -60,10 +60,10 @@ export const GPT_CATALOG: GPT[] = [
     badge: "popular",
     relatedGpts: ["proposal", "sales"],
     guide: [
-      "Share your discovery call notes for the most accurate pricing recommendation",
-      "Mention the client's business size and industry for better context",
-      "Ask for objection responses to prepare for price pushback",
-      "Request a payment structure suggestion (upfront, retainer, milestones)",
+      "Tell it what services you're offering and what came up on the discovery call",
+      "It considers the client's business size and industry to recommend a price range with justification",
+      "Ask for talking points to confidently defend your price and handle objections",
+      "It can suggest a payment structure — upfront, retainer, or milestone-based",
     ],
   },
   {
@@ -82,10 +82,10 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     relatedGpts: ["contract", "client-onboarding"],
     guide: [
-      "Provide discovery call context and agreed-upon pricing for a tailored proposal",
-      "Mention specific deliverables and timeline expectations",
-      "Ask it to include social proof or case study references",
-      "Copy the output directly into Google Docs for final formatting",
+      "Generates a full proposal: executive summary, solution, deliverables, timeline, pricing, and next steps",
+      "Share the problem being solved and your agreed pricing for the most tailored output",
+      "Output is formatted in clean markdown — copy it into Google Docs for final formatting",
+      "Best used after Pricing GPT so you already have a confident price to include",
     ],
   },
   {
@@ -106,10 +106,10 @@ export const GPT_CATALOG: GPT[] = [
     badge: "popular",
     relatedGpts: ["pricing", "proposal", "niche-research"],
     guide: [
-      "Specify your niche and target audience for more relevant outreach scripts",
-      "Paste the exact objection a prospect gave you for a tailored response",
-      "Ask for multi-step sequences (email, DM, cold call) not just single messages",
-      "Load a client contact for personalized outreach based on their business",
+      "Covers outreach (cold emails, cold calls, LinkedIn DMs), objection handling, and closing strategies",
+      "Specify your niche so outreach scripts are relevant to your target audience",
+      "Paste an exact objection from a prospect to get a tailored response",
+      "Works with or without a client loaded — use it for generic scripts or client-specific outreach",
     ],
   },
 
@@ -131,10 +131,10 @@ export const GPT_CATALOG: GPT[] = [
     badge: "popular",
     relatedGpts: ["prompt-engineer"],
     guide: [
-      "Describe the full use case — what triggers the automation and what should happen",
-      "Mention whether you need it built natively in GHL or with Make/Zapier/n8n",
-      "Ask for estimated build time so you can scope your project",
-      "Follow up with Prompt Engineering GPT to write prompts for any AI steps",
+      "Describe your automation use case — it will tell you if it's buildable natively in GHL or needs Make/Zapier/n8n",
+      "Gets specific: names exact triggers, actions, and configuration steps you need",
+      "Knows GHL workflows, custom fields, tags, pipelines, email/SMS sequences, and webhooks",
+      "Ask for a build time estimate so you can scope the project for your client",
     ],
   },
   {
@@ -153,10 +153,10 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     relatedGpts: ["workflow"],
     guide: [
-      "Specify the agent type: voice agent, chatbot, DM agent, or email agent",
-      "Include the business niche and desired tone/personality",
-      "Ask for test cases to validate the prompt before deploying",
-      "Paste an existing prompt to get improvement suggestions",
+      "Tell it which agent type you need: voice agent, chatbot, Instagram DM agent, email agent, or GHL workflow AI step",
+      "Share the business niche and desired personality/tone for the agent",
+      "It writes a complete system prompt with test cases and edge case handling",
+      "Paste an existing prompt to get improvement suggestions and catch gaps",
     ],
   },
   {
@@ -175,10 +175,10 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     relatedGpts: ["client-onboarding"],
     guide: [
-      "Provide the agreed scope of work and pricing for accurate contract terms",
-      "Specify the payment structure you want (upfront, retainer, milestone)",
-      "Ask for specific clauses like revision limits or termination terms",
-      "Always have a licensed attorney review before sending to clients",
+      "Generates a full service agreement: scope, timeline, pricing, revisions, termination, confidentiality, and liability",
+      "Provide the agreed deliverables and payment terms for an accurate contract",
+      "Works best when you've already used Pricing GPT and Proposal GPT to lock in the details",
+      "Important: output is a template — always have a licensed attorney review before sending",
     ],
   },
 
@@ -200,10 +200,10 @@ export const GPT_CATALOG: GPT[] = [
     badge: "pro",
     relatedGpts: ["weekly-review", "niche-research"],
     guide: [
-      "Share your current revenue, team size, and biggest challenge for tailored advice",
-      "Ask about specific growth stages: first client, scaling to $10K+, hiring, etc.",
-      "Be specific about your situation — vague questions get generic answers",
-      "Follow up with Weekly Review GPT to track your progress on advice given",
+      "Like talking to an experienced agency owner — direct, no-BS, and focused on what moves the needle",
+      "Share your current situation first so the advice is specific, not generic",
+      "All advice ties back to revenue impact — great for scaling decisions, hiring, and strategy",
+      "Best for big-picture questions: structuring your agency, pricing strategy, growth roadmap",
     ],
   },
   {
@@ -222,10 +222,10 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     relatedGpts: ["hamza-ai"],
     guide: [
-      "Share everything that happened this week — deals, calls, wins, and setbacks",
-      "Be honest about challenges so the debrief is actually useful",
-      "Use it every Friday to build a consistent reflection habit",
-      "Review your priorities from last week to track follow-through",
+      "Share your week — deals closed, calls made, challenges faced, wins — and it gives you a structured debrief",
+      "Output is organized into: Wins, Learnings, Blockers, and Top 3 Priorities for next week",
+      "Be honest about setbacks so the analysis is constructive and useful",
+      "Use it weekly to build a reflection habit and spot patterns over time",
     ],
   },
 
@@ -245,9 +245,10 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     relatedGpts: ["niche-research", "hamza-ai"],
     guide: [
-      "Answer one question at a time — the interview is short (4-6 questions)",
-      "Be honest about your revenue and experience level for better recommendations",
-      "You can exit anytime — partial info still helps personalize your tools",
+      "A quick 4-6 question interview to set up your agency profile and personalize all your tools",
+      "Covers: services you offer, target niche, location, revenue, goals, and biggest challenge",
+      "Answer one question at a time — it's short and conversational",
+      "You can exit anytime — even partial info helps personalize your experience",
     ],
   },
   {
@@ -266,10 +267,10 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     relatedGpts: ["workflow", "prompt-engineer"],
     guide: [
-      "Provide the client's name, business, and services they purchased",
-      "Mention the start date and any specific expectations from the client",
-      "Ask for all three outputs: welcome email, checklist, and kickoff agenda",
-      "Customize the tone to match your agency's brand voice",
+      "Generates three things: a welcome email, an onboarding checklist, and a kickoff call agenda",
+      "Share the client's name, business, services purchased, and start date",
+      "Mention the client's tech comfort level so materials match their experience",
+      "Makes you look organized and professional from day one with a new client",
     ],
   },
 ];
