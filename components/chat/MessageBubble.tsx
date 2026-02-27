@@ -22,6 +22,9 @@ export default function MessageBubble({ role, content, streaming }: MessageBubbl
 
   const isUser = role === "user";
 
+  // Strip Perplexity-style citation references like [1], [2][3], etc.
+  const cleanContent = isUser ? content : content.replace(/\[\d+\]/g, "");
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} group`}>
       <div
@@ -36,7 +39,7 @@ export default function MessageBubble({ role, content, streaming }: MessageBubbl
         ) : (
           <div className="markdown-content">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {content}
+              {cleanContent}
             </ReactMarkdown>
             {streaming && (
               <span className="inline-block w-1.5 h-4 bg-hex-teal animate-pulse ml-0.5 align-middle" />
