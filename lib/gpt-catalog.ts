@@ -12,6 +12,7 @@ export type GPT = {
   provider: "anthropic" | "perplexity" | "openai";
   badge?: "popular" | "new" | "pro";
   relatedGpts?: string[];
+  guide?: string[];
 };
 
 export const GPT_CATALOG: GPT[] = [
@@ -33,6 +34,12 @@ export const GPT_CATALOG: GPT[] = [
     provider: "perplexity",
     badge: "popular",
     relatedGpts: ["sales", "pricing"],
+    guide: [
+      "Provide your background, strengths, and location for personalized niche recommendations",
+      "Share the prospect's website URL for the most accurate pre-call research",
+      "Ask for competitor analysis in a specific city or region",
+      "Load a client contact first for instant research without re-entering details",
+    ],
   },
 
   // Sales & Revenue
@@ -52,6 +59,12 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     badge: "popular",
     relatedGpts: ["proposal", "sales"],
+    guide: [
+      "Share your discovery call notes for the most accurate pricing recommendation",
+      "Mention the client's business size and industry for better context",
+      "Ask for objection responses to prepare for price pushback",
+      "Request a payment structure suggestion (upfront, retainer, milestones)",
+    ],
   },
   {
     slug: "proposal",
@@ -68,6 +81,12 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-sonnet-4-6",
     provider: "anthropic",
     relatedGpts: ["contract", "client-onboarding"],
+    guide: [
+      "Provide discovery call context and agreed-upon pricing for a tailored proposal",
+      "Mention specific deliverables and timeline expectations",
+      "Ask it to include social proof or case study references",
+      "Copy the output directly into Google Docs for final formatting",
+    ],
   },
   {
     slug: "sales",
@@ -86,6 +105,12 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     badge: "popular",
     relatedGpts: ["pricing", "proposal", "niche-research"],
+    guide: [
+      "Specify your niche and target audience for more relevant outreach scripts",
+      "Paste the exact objection a prospect gave you for a tailored response",
+      "Ask for multi-step sequences (email, DM, cold call) not just single messages",
+      "Load a client contact for personalized outreach based on their business",
+    ],
   },
 
   // Fulfillment & Delivery
@@ -105,6 +130,12 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     badge: "popular",
     relatedGpts: ["prompt-engineer"],
+    guide: [
+      "Describe the full use case — what triggers the automation and what should happen",
+      "Mention whether you need it built natively in GHL or with Make/Zapier/n8n",
+      "Ask for estimated build time so you can scope your project",
+      "Follow up with Prompt Engineering GPT to write prompts for any AI steps",
+    ],
   },
   {
     slug: "prompt-engineer",
@@ -121,6 +152,12 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-haiku-4-5-20251001",
     provider: "anthropic",
     relatedGpts: ["workflow"],
+    guide: [
+      "Specify the agent type: voice agent, chatbot, DM agent, or email agent",
+      "Include the business niche and desired tone/personality",
+      "Ask for test cases to validate the prompt before deploying",
+      "Paste an existing prompt to get improvement suggestions",
+    ],
   },
   {
     slug: "contract",
@@ -137,6 +174,12 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-haiku-4-5-20251001",
     provider: "anthropic",
     relatedGpts: ["client-onboarding"],
+    guide: [
+      "Provide the agreed scope of work and pricing for accurate contract terms",
+      "Specify the payment structure you want (upfront, retainer, milestone)",
+      "Ask for specific clauses like revision limits or termination terms",
+      "Always have a licensed attorney review before sending to clients",
+    ],
   },
 
   // Strategy & Growth
@@ -156,6 +199,12 @@ export const GPT_CATALOG: GPT[] = [
     provider: "anthropic",
     badge: "pro",
     relatedGpts: ["weekly-review", "niche-research"],
+    guide: [
+      "Share your current revenue, team size, and biggest challenge for tailored advice",
+      "Ask about specific growth stages: first client, scaling to $10K+, hiring, etc.",
+      "Be specific about your situation — vague questions get generic answers",
+      "Follow up with Weekly Review GPT to track your progress on advice given",
+    ],
   },
   {
     slug: "weekly-review",
@@ -172,6 +221,12 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-haiku-4-5-20251001",
     provider: "anthropic",
     relatedGpts: ["hamza-ai"],
+    guide: [
+      "Share everything that happened this week — deals, calls, wins, and setbacks",
+      "Be honest about challenges so the debrief is actually useful",
+      "Use it every Friday to build a consistent reflection habit",
+      "Review your priorities from last week to track follow-through",
+    ],
   },
 
   // Onboarding
@@ -189,6 +244,11 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-haiku-4-5-20251001",
     provider: "anthropic",
     relatedGpts: ["niche-research", "hamza-ai"],
+    guide: [
+      "Answer one question at a time — the interview is short (4-6 questions)",
+      "Be honest about your revenue and experience level for better recommendations",
+      "You can exit anytime — partial info still helps personalize your tools",
+    ],
   },
   {
     slug: "client-onboarding",
@@ -205,6 +265,12 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-haiku-4-5-20251001",
     provider: "anthropic",
     relatedGpts: ["workflow", "prompt-engineer"],
+    guide: [
+      "Provide the client's name, business, and services they purchased",
+      "Mention the start date and any specific expectations from the client",
+      "Ask for all three outputs: welcome email, checklist, and kickoff agenda",
+      "Customize the tone to match your agency's brand voice",
+    ],
   },
 ];
 

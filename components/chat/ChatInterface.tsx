@@ -9,8 +9,9 @@ import ConversationHistory from "./ConversationHistory";
 import SuggestedPrompts from "@/components/gpts/SuggestedPrompts";
 import HandoffChips from "./HandoffChips";
 import { getGptBySlug } from "@/lib/gpt-catalog";
-import { History, Plus } from "lucide-react";
+import { Eye, History, Plus } from "lucide-react";
 import Button from "@/components/ui/Button";
+import GptGuideModal from "./GptGuideModal";
 
 interface Message {
   id: string;
@@ -40,6 +41,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [showHistory, setShowHistory] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const freshChatRef = useRef(false); // true when user explicitly clicks "+ New"
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -268,6 +270,17 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
           <h2 className="font-display text-lg font-semibold text-[var(--hex-text-primary)]">
             {gpt?.name || gptSlug}
           </h2>
+          {gpt?.guide && gpt.guide.length > 0 && (
+            <button
+              onClick={() => setShowGuide(true)}
+              className="flex items-center gap-1.5 mt-1 text-xs text-[var(--hex-text-muted)] hover:text-hex-teal transition-colors"
+            >
+              <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center">
+                <Eye size={10} />
+              </span>
+              What is this GPT best for?
+            </button>
+          )}
           {clientName && (
             <ContextBadge clientName={clientName} />
           )}
@@ -325,6 +338,13 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
           currentId={conversationId}
           onSelect={loadConversation}
           onClose={() => setShowHistory(false)}
+        />
+      )}
+      {showGuide && gpt?.guide && (
+        <GptGuideModal
+          gptName={gpt.name}
+          guide={gpt.guide}
+          onClose={() => setShowGuide(false)}
         />
       )}
     </div>
