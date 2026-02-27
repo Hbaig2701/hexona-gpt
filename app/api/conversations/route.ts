@@ -11,11 +11,13 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const gptSlug = searchParams.get("gptSlug");
   const clientId = searchParams.get("clientId");
+  const standalone = searchParams.get("standalone");
   const limit = parseInt(searchParams.get("limit") || "20");
 
   const where: Record<string, unknown> = { userId: session.user.id };
   if (gptSlug) where.gptSlug = gptSlug;
   if (clientId) where.clientId = clientId;
+  else if (standalone) where.clientId = null;
 
   const conversations = await prisma.conversation.findMany({
     where,

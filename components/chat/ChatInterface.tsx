@@ -82,10 +82,13 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
 
   const gpt = getGptBySlug(gptSlug);
 
-  // Auto-resume: for contact-scoped GPTs, find the existing conversation
+  // Auto-resume: find the most recent conversation for this GPT (and client if scoped)
   useEffect(() => {
-    if (clientId && !conversationId && !freshChatRef.current) {
-      fetch(`/api/conversations?gptSlug=${gptSlug}&clientId=${clientId}&limit=1`)
+    if (!conversationId && !freshChatRef.current) {
+      const params = new URLSearchParams({ gptSlug, limit: "1" });
+      if (clientId) params.set("clientId", clientId);
+      else params.set("standalone", "1");
+      fetch(`/api/conversations?${params}`)
         .then((r) => r.json())
         .then((data) => {
           if (Array.isArray(data) && data.length > 0 && data[0]._count?.messages > 0) {
