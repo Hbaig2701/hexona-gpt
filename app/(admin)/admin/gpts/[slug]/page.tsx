@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Save, Upload, Trash2, Clock } from "lucide-react";
+import PromptEditorChat from "@/components/admin/PromptEditorChat";
 
 interface GptConfigData {
   gptSlug: string;
@@ -156,6 +157,13 @@ export default function AdminGptConfigPage() {
               <Save size={14} /> Save Prompt
             </Button>
           </div>
+
+          {/* Prompt Editor Chat */}
+          <PromptEditorChat
+            currentPrompt={config.systemPrompt}
+            gptSlug={slug}
+            onApplyPrompt={(newPrompt) => setConfig({ ...config, systemPrompt: newPrompt })}
+          />
 
           {/* Version History */}
           {config.promptVersions.length > 0 && (
