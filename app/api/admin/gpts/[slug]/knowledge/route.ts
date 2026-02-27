@@ -30,10 +30,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   const name = file.name.toLowerCase();
 
   if (name.endsWith(".pdf")) {
-    const pdfModule = await import("pdf-parse");
-    const pdfParse = (pdfModule as unknown as { default: (buf: Buffer) => Promise<{ text: string }> }).default ?? pdfModule;
-    const result = await (pdfParse as (buf: Buffer) => Promise<{ text: string }>)(buffer);
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: buffer });
+    const result = await parser.getText();
     content = result.text;
+    await parser.destroy();
   } else if (name.endsWith(".docx")) {
     const mammoth = await import("mammoth");
     const result = await mammoth.extractRawText({ buffer });

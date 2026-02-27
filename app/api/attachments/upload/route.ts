@@ -27,10 +27,11 @@ export async function POST(req: NextRequest) {
   if (name.endsWith(".pdf")) {
     type = "pdf";
     try {
-      const pdfModule = await import("pdf-parse");
-      const pdfParse = (pdfModule as unknown as { default: (buf: Buffer) => Promise<{ text: string }> }).default ?? pdfModule;
-      const result = await (pdfParse as (buf: Buffer) => Promise<{ text: string }>)(buffer);
+      const { PDFParse } = await import("pdf-parse");
+      const parser = new PDFParse({ data: buffer });
+      const result = await parser.getText();
       extractedText = result.text;
+      await parser.destroy();
     } catch (error) {
       console.error("PDF parse error:", error);
       return NextResponse.json({ error: "Failed to parse PDF" }, { status: 500 });
