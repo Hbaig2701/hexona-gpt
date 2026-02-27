@@ -32,7 +32,7 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "perplexity/sonar",
     provider: "perplexity",
     badge: "popular",
-    relatedGpts: ["sales-scripts", "pricing"],
+    relatedGpts: ["outreach", "pricing"],
   },
 
   // Sales & Revenue
@@ -70,8 +70,8 @@ export const GPT_CATALOG: GPT[] = [
     relatedGpts: ["contract", "client-onboarding"],
   },
   {
-    slug: "sales-scripts",
-    name: "Sales GPT",
+    slug: "outreach",
+    name: "Outreach GPT",
     description: "Generate cold outreach scripts tailored to your niche and service offering.",
     category: "sales",
     scope: "both",
@@ -234,7 +234,7 @@ export const MODEL_ROUTING: Record<string, { provider: string; model: string }> 
   "niche-research": { provider: "perplexity", model: "perplexity/sonar" },
   "pricing": { provider: "anthropic", model: "claude-sonnet-4-6" },
   "proposal": { provider: "anthropic", model: "claude-sonnet-4-6" },
-  "sales-scripts": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
+  "outreach": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "objection-handler": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "workflow": { provider: "anthropic", model: "claude-sonnet-4-6" },
   "prompt-engineer": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },

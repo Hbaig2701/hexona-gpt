@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,8 +17,9 @@ import {
   Shield,
   Menu,
   X,
+  Trash2,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSidebarStore } from "@/lib/stores/sidebar-store";
 import { GPT_CATEGORIES, getGptsByCategory, type GPTCategory } from "@/lib/gpt-catalog";
 
@@ -37,11 +38,14 @@ const categoryIcons: Record<string, React.ElementType> = {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const { isCollapsed, toggle } = useSidebarStore();
   const [clients, setClients] = useState<ClientItem[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [clientsExpanded, setClientsExpanded] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<ClientItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetch("/api/clients")
@@ -60,6 +64,26 @@ export default function Sidebar() {
       return next;
     });
   }
+
+  const handleDeleteContact = useCallback(async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/clients/${deleteTarget.id}`, { method: "DELETE" });
+      if (res.ok) {
+        setClients((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+        // Redirect if currently viewing the deleted contact
+        if (pathname.startsWith(`/clients/${deleteTarget.id}`)) {
+          router.push("/dashboard");
+        }
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
+  }, [deleteTarget, pathname, router]);
 
   const isActive = (path: string) => pathname === path;
   const isActivePrefix = (prefix: string) => pathname.startsWith(prefix);
@@ -144,10 +168,23 @@ export default function Sidebar() {
                     <Link
                       key={client.id}
                       href={`/clients/${client.id}`}
-                      className={navLinkClass(isActivePrefix(`/clients/${client.id}`))}
+                      className={`${navLinkClass(isActivePrefix(`/clients/${client.id}`))} justify-between`}
                     >
-                      <span className="w-2 h-2 rounded-full bg-hex-teal/50 shrink-0" />
-                      <span className="truncate">{client.businessName}</span>
+                      <span className="flex items-center gap-3 min-w-0">
+                        <span className="w-2 h-2 rounded-full bg-hex-teal/50 shrink-0" />
+                        <span className="truncate">{client.businessName}</span>
+                      </span>
+                      <span
+                        role="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDeleteTarget(client);
+                        }}
+                        className="shrink-0 p-1 rounded text-red-400 hover:bg-red-400/10"
+                      >
+                        <Trash2 size={14} />
+                      </span>
                     </Link>
                   ))}
                   {clients.length === 0 && (
@@ -241,6 +278,50 @@ export default function Sidebar() {
           )}
         </div>
       </aside>
+
+      {/* Delete confirmation modal */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+            onClick={() => !deleting && setDeleteTarget(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[var(--hex-dark-800)] border border-[var(--hex-dark-500)] rounded-xl p-6 max-w-sm mx-4 shadow-xl"
+            >
+              <h3 className="text-lg font-semibold text-[var(--hex-text-primary)] mb-2">
+                Delete contact?
+              </h3>
+              <p className="text-sm text-[var(--hex-text-secondary)] mb-6">
+                Are you sure you want to delete <strong>{deleteTarget.businessName}</strong>? This will remove all conversations and data associated with this contact. This action cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={deleting}
+                  className="px-4 py-2 rounded-lg text-sm text-[var(--hex-text-secondary)] hover:bg-hex-dark-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteContact}
+                  disabled={deleting}
+                  className="px-4 py-2 rounded-lg text-sm bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
