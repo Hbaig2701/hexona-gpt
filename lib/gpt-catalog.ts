@@ -17,36 +17,21 @@ export type GPT = {
 export const GPT_CATALOG: GPT[] = [
   // Research & Discovery
   {
-    slug: "niche-selection",
-    name: "Niche Selection GPT",
-    description: "Find the perfect niche for your agency based on your strengths, location, and market demand.",
-    category: "research",
-    scope: "global",
-    icon: "Compass",
-    suggestedPrompts: [
-      "Help me pick a niche based on my background and location",
-      "What niches are hot in my city right now?",
-      "Compare these 3 niches for me: roofing, dental, HVAC",
-    ],
-    defaultModel: "claude-haiku-4-5-20251001",
-    provider: "anthropic",
-    badge: "popular",
-    relatedGpts: ["market-research", "sales-scripts"],
-  },
-  {
-    slug: "market-research",
-    name: "Market Research GPT",
-    description: "Research a prospect's business, industry, and competitors before your sales call.",
+    slug: "niche-research",
+    name: "Niche & Research GPT",
+    description: "Find the perfect niche and research prospects before your sales calls.",
     category: "research",
     scope: "both",
     icon: "Search",
     suggestedPrompts: [
+      "Help me pick a niche based on my background and location",
       "Research this business before my discovery call",
-      "What are the common pain points in this industry?",
+      "Compare these 3 niches for me: roofing, dental, HVAC",
       "Find competitors for this client's business",
     ],
     defaultModel: "perplexity/sonar",
     provider: "perplexity",
+    badge: "popular",
     relatedGpts: ["sales-scripts", "pricing"],
   },
 
@@ -184,7 +169,7 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-sonnet-4-6",
     provider: "anthropic",
     badge: "pro",
-    relatedGpts: ["weekly-review", "niche-selection"],
+    relatedGpts: ["weekly-review", "niche-research"],
   },
   {
     slug: "weekly-review",
@@ -217,7 +202,7 @@ export const GPT_CATALOG: GPT[] = [
     ],
     defaultModel: "claude-haiku-4-5-20251001",
     provider: "anthropic",
-    relatedGpts: ["niche-selection", "hamza-ai"],
+    relatedGpts: ["niche-research", "hamza-ai"],
   },
   {
     slug: "client-onboarding",
@@ -246,8 +231,7 @@ export const GPT_CATEGORIES: Record<GPTCategory, { label: string; icon: string; 
 };
 
 export const MODEL_ROUTING: Record<string, { provider: string; model: string }> = {
-  "niche-selection": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
-  "market-research": { provider: "perplexity", model: "perplexity/sonar" },
+  "niche-research": { provider: "perplexity", model: "perplexity/sonar" },
   "pricing": { provider: "anthropic", model: "claude-sonnet-4-6" },
   "proposal": { provider: "anthropic", model: "claude-sonnet-4-6" },
   "sales-scripts": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
