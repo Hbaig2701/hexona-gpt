@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Paperclip, X } from "lucide-react";
+import { Send, Square, Paperclip, X } from "lucide-react";
 
 interface AttachmentData {
   type: string;
@@ -19,10 +19,11 @@ interface AttachmentFile {
 
 interface ChatInputProps {
   onSend: (message: string, attachments?: AttachmentData[]) => void;
+  onStop?: () => void;
   loading: boolean;
 }
 
-export default function ChatInput({ onSend, loading }: ChatInputProps) {
+export default function ChatInput({ onSend, onStop, loading }: ChatInputProps) {
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -180,14 +181,23 @@ export default function ChatInput({ onSend, loading }: ChatInputProps) {
           style={{ minHeight: "44px" }}
         />
 
-        {/* Send button */}
-        <button
-          onClick={handleSend}
-          disabled={loading || (!input.trim() && attachments.length === 0)}
-          className="p-2.5 rounded-lg bg-gradient-to-br from-hex-teal to-[#0095A8] text-hex-dark-900 disabled:opacity-50 disabled:cursor-not-allowed teal-glow transition-all hover:opacity-90"
-        >
-          <Send size={18} />
-        </button>
+        {/* Send / Stop button */}
+        {loading ? (
+          <button
+            onClick={onStop}
+            className="p-2.5 rounded-lg bg-hex-error/80 text-white hover:bg-hex-error transition-all"
+          >
+            <Square size={18} />
+          </button>
+        ) : (
+          <button
+            onClick={handleSend}
+            disabled={!input.trim() && attachments.length === 0}
+            className="p-2.5 rounded-lg bg-gradient-to-br from-hex-teal to-[#0095A8] text-hex-dark-900 disabled:opacity-50 disabled:cursor-not-allowed teal-glow transition-all hover:opacity-90"
+          >
+            <Send size={18} />
+          </button>
+        )}
       </div>
     </div>
   );

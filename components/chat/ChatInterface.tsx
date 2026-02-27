@@ -42,6 +42,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
   const [showHistory, setShowHistory] = useState(false);
   const freshChatRef = useRef(false); // true when user explicitly clicks "+ New"
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Smooth streaming buffer
   const streamBufferRef = useRef("");
@@ -142,6 +143,10 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
     resetBuffer();
     setStreamingContent("");
 
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+    let fullContent = "";
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -153,6 +158,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
           message: text,
           attachments,
         }),
+        signal: abortController.signal,
       });
 
       if (!res.ok) {
@@ -162,8 +168,6 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
 
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
-      let fullContent = "";
-
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
@@ -213,15 +217,32 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
 
       setMessages((prev) => [...prev, aiMsg]);
     } catch (error) {
-      const errMsg: Message = {
-        id: `err-${Date.now()}`,
-        role: "assistant",
-        content: error instanceof Error ? error.message : "Something went wrong. Please try again.",
-      };
-      resetBuffer();
-      setStreamingContent("");
-      setMessages((prev) => [...prev, errMsg]);
+      // If aborted (stop button), save whatever was generated so far
+      if (abortController.signal.aborted && fullContent) {
+        resetBuffer();
+        setStreamingContent("");
+        const partialMsg: Message = {
+          id: `ai-${Date.now()}`,
+          role: "assistant",
+          content: fullContent,
+        };
+        setMessages((prev) => [...prev, partialMsg]);
+      } else if (!abortController.signal.aborted) {
+        const errMsg: Message = {
+          id: `err-${Date.now()}`,
+          role: "assistant",
+          content: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+        };
+        resetBuffer();
+        setStreamingContent("");
+        setMessages((prev) => [...prev, errMsg]);
+      } else {
+        // Aborted with no content - just clean up
+        resetBuffer();
+        setStreamingContent("");
+      }
     } finally {
+      abortControllerRef.current = null;
       setLoading(false);
     }
   }, [gptSlug, clientId, conversationId, loading, flushBuffer]);
@@ -294,7 +315,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
       </div>
 
       {/* Input */}
-      <ChatInput onSend={handleSend} loading={loading} />
+      <ChatInput onSend={handleSend} onStop={() => abortControllerRef.current?.abort()} loading={loading} />
 
       {/* Conversation History Panel */}
       {showHistory && (
