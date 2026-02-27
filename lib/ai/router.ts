@@ -124,6 +124,8 @@ export async function streamChat({
       if (lastError) throw lastError;
     }
   } catch (error) {
-    callbacks.onError(error instanceof Error ? error : new Error(String(error)));
+    const err = error instanceof Error ? error : new Error(String(error));
+    console.error(`[streamChat] ${provider}/${model} failed:`, err.message);
+    callbacks.onError(err);
   }
 }
