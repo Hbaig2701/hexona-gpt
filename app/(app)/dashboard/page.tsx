@@ -51,44 +51,44 @@ export default function DashboardPage() {
   const popularGpts = GPT_CATALOG.filter((g) => g.badge === "popular" || g.slug === "hamza-ai").slice(0, 4);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-10 pb-8">
       {/* Hero Greeting */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="font-display text-3xl font-bold text-[var(--hex-text-primary)]">
+        <h1 className="font-display text-4xl font-bold text-[var(--hex-text-primary)]">
           {getGreeting()},{" "}
           <span className="text-gradient">
             {session?.user?.name?.split(" ")[0] || "there"}
           </span>
           .
         </h1>
-        <p className="text-[var(--hex-text-secondary)] mt-1">
+        <p className="text-[var(--hex-text-secondary)] mt-2 text-base">
           Here&apos;s your agency command center.
         </p>
       </motion.div>
 
       {/* Profile Snapshot */}
       {profile?.completedAt && (
-        <Card hoverable={false}>
-          <div className="flex flex-wrap gap-6 text-sm">
+        <Card hoverable={false} className="!p-6">
+          <div className="flex flex-wrap gap-8">
             {profile.niche && (
               <div>
-                <span className="text-[var(--hex-text-muted)]">Niche</span>
-                <p className="text-[var(--hex-text-primary)] font-medium">{profile.niche}</p>
+                <span className="text-[var(--hex-text-muted)] text-xs uppercase tracking-wider">Niche</span>
+                <p className="text-[var(--hex-text-primary)] font-medium text-base mt-0.5">{profile.niche}</p>
               </div>
             )}
             {profile.monthlyRevenue && (
               <div>
-                <span className="text-[var(--hex-text-muted)]">Revenue</span>
-                <p className="text-[var(--hex-text-primary)] font-medium">{profile.monthlyRevenue}</p>
+                <span className="text-[var(--hex-text-muted)] text-xs uppercase tracking-wider">Revenue</span>
+                <p className="text-[var(--hex-text-primary)] font-medium text-base mt-0.5">{profile.monthlyRevenue}</p>
               </div>
             )}
             {profile.revenueGoal && (
               <div>
-                <span className="text-[var(--hex-text-muted)]">Goal</span>
-                <p className="text-[var(--hex-text-primary)] font-medium">{profile.revenueGoal}</p>
+                <span className="text-[var(--hex-text-muted)] text-xs uppercase tracking-wider">Goal</span>
+                <p className="text-[var(--hex-text-primary)] font-medium text-base mt-0.5">{profile.revenueGoal}</p>
               </div>
             )}
           </div>
@@ -98,14 +98,14 @@ export default function DashboardPage() {
       {/* Suggested Action */}
       {!profile?.completedAt && (
         <Link href="/onboarding">
-          <Card className="border-hex-teal/30 hover:border-hex-teal/50 cursor-pointer">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-hex-teal/15 flex items-center justify-center">
-                <LucideIcons.Rocket className="w-5 h-5 text-hex-teal" />
+          <Card className="border-hex-teal/30 hover:border-hex-teal/50 cursor-pointer !p-6">
+            <div className="flex items-center gap-5">
+              <div className="w-12 h-12 rounded-xl bg-hex-teal/15 flex items-center justify-center shrink-0">
+                <LucideIcons.Rocket className="w-6 h-6 text-hex-teal" />
               </div>
               <div>
-                <p className="text-[var(--hex-text-primary)] font-medium">Complete your agency profile</p>
-                <p className="text-[var(--hex-text-secondary)] text-sm">Personalize all AI tools to your agency in 3 minutes</p>
+                <p className="text-[var(--hex-text-primary)] font-semibold text-base">Complete your agency profile</p>
+                <p className="text-[var(--hex-text-secondary)] text-sm mt-0.5">Personalize all AI tools to your agency in 3 minutes</p>
               </div>
             </div>
           </Card>
@@ -115,21 +115,21 @@ export default function DashboardPage() {
       {/* Continue Where You Left Off */}
       {recentConversations.length > 0 && (
         <div>
-          <h2 className="font-display text-lg font-semibold text-[var(--hex-text-primary)] mb-3">
+          <h2 className="font-display text-xl font-semibold text-[var(--hex-text-primary)] mb-4">
             Continue where you left off
           </h2>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {recentConversations.map((conv) => {
               const gpt = GPT_CATALOG.find((g) => g.slug === conv.gptSlug);
               return (
                 <Link key={conv.id} href={conv.client ? `/clients/${conv.client.id}/gpts/${conv.gptSlug}?conversation=${conv.id}` : `/gpts/${conv.gptSlug}?conversation=${conv.id}`}>
-                  <Card className="cursor-pointer">
-                    <p className="text-sm text-hex-teal font-medium">{gpt?.name || conv.gptSlug}</p>
-                    <p className="text-[var(--hex-text-primary)] text-sm mt-1 truncate">
+                  <Card className="cursor-pointer !p-6 h-full">
+                    <p className="text-base text-hex-teal font-semibold">{gpt?.name || conv.gptSlug}</p>
+                    <p className="text-[var(--hex-text-primary)] text-sm mt-1.5 truncate">
                       {conv.title || "Untitled conversation"}
                     </p>
                     {conv.client && (
-                      <p className="text-xs text-[var(--hex-text-muted)] mt-1">{conv.client.businessName}</p>
+                      <p className="text-sm text-[var(--hex-text-secondary)] mt-1.5">{conv.client.businessName}</p>
                     )}
                   </Card>
                 </Link>
@@ -141,10 +141,10 @@ export default function DashboardPage() {
 
       {/* Quick Access GPT Grid */}
       <div>
-        <h2 className="font-display text-lg font-semibold text-[var(--hex-text-primary)] mb-3">
+        <h2 className="font-display text-xl font-semibold text-[var(--hex-text-primary)] mb-4">
           Quick access
         </h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {popularGpts.map((gpt) => (
             <GPTQuickCard key={gpt.slug} gpt={gpt} />
           ))}
@@ -153,26 +153,26 @@ export default function DashboardPage() {
 
       {/* All Categories */}
       <div>
-        <h2 className="font-display text-lg font-semibold text-[var(--hex-text-primary)] mb-3">
+        <h2 className="font-display text-xl font-semibold text-[var(--hex-text-primary)] mb-4">
           All GPT tools
         </h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(Object.entries(GPT_CATEGORIES) as [string, { label: string; icon: string; color: string }][]).map(
             ([key, cat]) => (
               <Link key={key} href={`/gpts/${key}`}>
-                <Card className="cursor-pointer flex items-center gap-4">
+                <Card className="cursor-pointer flex items-center gap-5 !p-6">
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                     style={{ backgroundColor: `${cat.color}20` }}
                   >
                     {(() => {
                       const Icon = (LucideIcons as unknown as Record<string, React.ElementType>)[cat.icon] || LucideIcons.Zap;
-                      return <Icon size={20} style={{ color: cat.color }} />;
+                      return <Icon size={22} style={{ color: cat.color }} />;
                     })()}
                   </div>
                   <div>
-                    <p className="text-[var(--hex-text-primary)] font-medium text-sm">{cat.label}</p>
-                    <p className="text-[var(--hex-text-muted)] text-xs">
+                    <p className="text-[var(--hex-text-primary)] font-semibold text-base">{cat.label}</p>
+                    <p className="text-[var(--hex-text-secondary)] text-sm mt-0.5">
                       {GPT_CATALOG.filter((g) => g.category === key).length} tools
                     </p>
                   </div>
@@ -189,17 +189,16 @@ export default function DashboardPage() {
 function GPTQuickCard({ gpt }: { gpt: GPT }) {
   const Icon = (LucideIcons as unknown as Record<string, React.ElementType>)[gpt.icon] || LucideIcons.Zap;
   const category = GPT_CATEGORIES[gpt.category];
-  const href = gpt.scope === "client" ? `/gpts/${gpt.slug}` : `/gpts/${gpt.slug}`;
 
   return (
-    <Link href={href}>
-      <Card className="cursor-pointer h-full">
-        <div className="flex items-start justify-between mb-3">
+    <Link href={`/gpts/${gpt.slug}`}>
+      <Card className="cursor-pointer h-full !p-6">
+        <div className="flex items-start justify-between mb-4">
           <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center"
+            className="w-12 h-12 rounded-xl flex items-center justify-center"
             style={{ backgroundColor: `${category.color}20` }}
           >
-            <Icon size={20} style={{ color: category.color }} />
+            <Icon size={22} style={{ color: category.color }} />
           </div>
           {gpt.badge && (
             <Badge variant={gpt.badge === "popular" ? "teal" : gpt.badge === "pro" ? "warning" : "success"}>
@@ -207,8 +206,8 @@ function GPTQuickCard({ gpt }: { gpt: GPT }) {
             </Badge>
           )}
         </div>
-        <p className="text-[var(--hex-text-primary)] font-medium text-sm">{gpt.name}</p>
-        <p className="text-[var(--hex-text-muted)] text-xs mt-1 line-clamp-2">{gpt.description}</p>
+        <p className="text-[var(--hex-text-primary)] font-semibold text-base">{gpt.name}</p>
+        <p className="text-[var(--hex-text-secondary)] text-sm mt-1.5 line-clamp-2">{gpt.description}</p>
       </Card>
     </Link>
   );
