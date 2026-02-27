@@ -101,14 +101,28 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Load conversation history (last messages, up to ~2000 tokens)
+  // Load conversation history with token-aware truncation
   const historyMessages = await prisma.message.findMany({
     where: { conversationId: convId },
-    orderBy: { createdAt: "asc" },
-    take: 20,
+    orderBy: { createdAt: "desc" },
+    take: 30, // fetch more than needed, then truncate by token estimate
   });
 
-  const chatMessages = historyMessages.map((m) => ({
+  // Reverse to chronological order
+  historyMessages.reverse();
+
+  // Truncate to fit within ~6000 tokens (rough estimate: 1 token ≈ 4 chars)
+  const MAX_HISTORY_CHARS = 24000;
+  let totalChars = 0;
+  const truncatedMessages: typeof historyMessages = [];
+  for (let i = historyMessages.length - 1; i >= 0; i--) {
+    const msgChars = historyMessages[i].content.length;
+    if (totalChars + msgChars > MAX_HISTORY_CHARS && truncatedMessages.length > 0) break;
+    totalChars += msgChars;
+    truncatedMessages.unshift(historyMessages[i]);
+  }
+
+  const chatMessages = truncatedMessages.map((m) => ({
     role: (m.role === "USER" ? "user" : "assistant") as "user" | "assistant",
     content: m.content,
   }));
@@ -199,10 +213,16 @@ export async function POST(req: NextRequest) {
             controller.close();
           },
           onError(error) {
-            console.error("Stream error:", error);
+            console.error("Stream error:", error.message, { provider: routing.provider, model: routing.model });
+            // Surface a useful error message instead of a generic one
+            const userMessage = error.message?.includes("rate")
+              ? "Rate limit reached. Please wait a moment and try again."
+              : error.message?.includes("context_length") || error.message?.includes("too many tokens")
+              ? "This conversation is too long. Please start a new conversation."
+              : `Something went wrong (${routing.provider}). Please try again.`;
             controller.enqueue(
               encoder.encode(
-                `data: ${JSON.stringify({ error: "An error occurred while generating a response." })}\n\n`
+                `data: ${JSON.stringify({ error: userMessage })}\n\n`
               )
             );
             controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
