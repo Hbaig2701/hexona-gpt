@@ -63,13 +63,14 @@ export default function GptPage() {
   const params = useParams();
   const slug = params.gptSlug as string;
 
-  // Check if this is a category
-  if (slug in GPT_CATEGORIES) {
+  // Check if it's a valid GPT first (takes priority over category if slug matches both)
+  const gpt = getGptBySlug(slug);
+
+  // If not a GPT, check if this is a category
+  if (!gpt && slug in GPT_CATEGORIES) {
     return <CategoryView category={slug as GPTCategory} />;
   }
 
-  // Check if it's a valid GPT
-  const gpt = getGptBySlug(slug);
   if (!gpt) {
     return <p className="text-hex-text-muted text-center py-12">GPT not found</p>;
   }
