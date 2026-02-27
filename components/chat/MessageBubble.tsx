@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Copy, Check } from "lucide-react";
@@ -13,9 +13,27 @@ interface MessageBubbleProps {
 
 export default function MessageBubble({ role, content, streaming }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
+  const markdownRef = useRef<HTMLDivElement>(null);
 
   function handleCopy() {
-    navigator.clipboard.writeText(content);
+    // Copy as rich text (HTML) so it pastes nicely into Google Docs, Word, etc.
+    // Falls back to plain text if clipboard API doesn't support HTML.
+    if (markdownRef.current) {
+      const html = markdownRef.current.innerHTML;
+      const plainText = markdownRef.current.innerText;
+      try {
+        navigator.clipboard.write([
+          new ClipboardItem({
+            "text/html": new Blob([html], { type: "text/html" }),
+            "text/plain": new Blob([plainText], { type: "text/plain" }),
+          }),
+        ]);
+      } catch {
+        navigator.clipboard.writeText(plainText);
+      }
+    } else {
+      navigator.clipboard.writeText(content);
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -37,7 +55,7 @@ export default function MessageBubble({ role, content, streaming }: MessageBubbl
         {isUser ? (
           <p className="whitespace-pre-wrap">{content}</p>
         ) : (
-          <div className="markdown-content">
+          <div className="markdown-content" ref={markdownRef}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {cleanContent}
             </ReactMarkdown>
