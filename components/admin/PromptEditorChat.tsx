@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Wand2, ChevronDown, ChevronUp, Send, Check, Loader2 } from "lucide-react";
+import { Wand2, ChevronDown, ChevronUp, Send, Check, Loader2, Maximize2, Minimize2 } from "lucide-react";
 
 interface Edit {
   oldText: string;
@@ -22,8 +22,40 @@ interface PromptEditorChatProps {
   onApplyPrompt: (newPrompt: string) => void;
 }
 
+function DiffBlock({ edit, defaultExpanded }: { edit: Edit; defaultExpanded: boolean }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const isLong = edit.oldText.length > 150 || edit.newText.length > 150;
+
+  return (
+    <div className="rounded-lg overflow-hidden border border-hex-dark-500 text-xs font-mono">
+      {isLong && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center justify-between px-3 py-1 bg-hex-dark-600 text-hex-text-muted hover:text-hex-text-primary transition-colors"
+        >
+          <span>{expanded ? "Collapse" : "Expand full diff"}</span>
+          {expanded ? <Minimize2 size={10} /> : <Maximize2 size={10} />}
+        </button>
+      )}
+      <div className="bg-hex-error/10 text-hex-error/80 px-3 py-2 border-b border-hex-dark-500">
+        <span className="text-hex-error mr-1 select-none">-</span>
+        <span className={expanded || !isLong ? "whitespace-pre-wrap break-words" : "line-clamp-2"}>
+          {edit.oldText}
+        </span>
+      </div>
+      <div className="bg-hex-success/10 text-hex-success/80 px-3 py-2">
+        <span className="text-hex-success mr-1 select-none">+</span>
+        <span className={expanded || !isLong ? "whitespace-pre-wrap break-words" : "line-clamp-2"}>
+          {edit.newText}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function PromptEditorChat({ currentPrompt, gptSlug, onApplyPrompt }: PromptEditorChatProps) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -105,32 +137,39 @@ export default function PromptEditorChat({ currentPrompt, gptSlug, onApplyPrompt
     }
   }
 
-  // Truncate long text for display
-  function truncate(text: string, maxLen: number) {
-    if (text.length <= maxLen) return text;
-    return text.slice(0, maxLen) + "...";
-  }
-
   return (
     <div className="border border-hex-dark-500 rounded-lg overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-hex-dark-700 hover:bg-hex-dark-600 transition-colors"
-      >
-        <span className="flex items-center gap-2 text-sm font-medium text-hex-text-primary">
-          <Wand2 size={14} className="text-hex-teal" />
-          Prompt Editor
-        </span>
-        {open ? (
-          <ChevronUp size={14} className="text-hex-text-muted" />
-        ) : (
-          <ChevronDown size={14} className="text-hex-text-muted" />
+      {/* Header */}
+      <div className="flex items-center bg-hex-dark-700">
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex-1 flex items-center justify-between px-4 py-3 hover:bg-hex-dark-600 transition-colors"
+        >
+          <span className="flex items-center gap-2 text-sm font-medium text-hex-text-primary">
+            <Wand2 size={14} className="text-hex-teal" />
+            Prompt Editor
+          </span>
+          {open ? (
+            <ChevronUp size={14} className="text-hex-text-muted" />
+          ) : (
+            <ChevronDown size={14} className="text-hex-text-muted" />
+          )}
+        </button>
+        {open && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="px-3 py-3 text-hex-text-muted hover:text-hex-text-primary transition-colors border-l border-hex-dark-500"
+            title={expanded ? "Collapse panel" : "Expand panel"}
+          >
+            {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          </button>
         )}
-      </button>
+      </div>
 
       {open && (
         <div className="bg-hex-dark-800 border-t border-hex-dark-500">
-          <div className="max-h-80 overflow-y-auto p-4 space-y-3">
+          {/* Messages area — taller when expanded */}
+          <div className={`overflow-y-auto p-4 space-y-3 ${expanded ? "max-h-[70vh]" : "max-h-80"}`}>
             {messages.length === 0 && (
               <p className="text-xs text-hex-text-muted text-center py-4">
                 Tell me what to change. e.g. &quot;Make the tone more direct&quot; or &quot;The pricing answer was wrong — it should recommend $2k-5k instead&quot;
@@ -145,27 +184,18 @@ export default function PromptEditorChat({ currentPrompt, gptSlug, onApplyPrompt
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="bg-hex-dark-700 text-hex-text-secondary rounded-lg px-3 py-2 max-w-[90%]">
+                    <div className="bg-hex-dark-700 text-hex-text-secondary rounded-lg px-3 py-2">
                       {msg.content}
                     </div>
 
-                    {/* Show specific edits */}
+                    {/* Show specific edits — full text, expandable */}
                     {msg.edits && msg.edits.length > 0 && (
-                      <div className="space-y-2 max-w-[90%]">
+                      <div className="space-y-2">
                         <p className="text-xs text-hex-text-muted font-medium">
                           {msg.edits.length} edit{msg.edits.length > 1 ? "s" : ""}:
                         </p>
                         {msg.edits.map((edit, j) => (
-                          <div key={j} className="rounded-lg overflow-hidden border border-hex-dark-500 text-xs font-mono">
-                            <div className="bg-hex-error/10 text-hex-error/80 px-3 py-1.5 border-b border-hex-dark-500">
-                              <span className="text-hex-error mr-1">-</span>
-                              {truncate(edit.oldText, 120)}
-                            </div>
-                            <div className="bg-hex-success/10 text-hex-success/80 px-3 py-1.5">
-                              <span className="text-hex-success mr-1">+</span>
-                              {truncate(edit.newText, 120)}
-                            </div>
-                          </div>
+                          <DiffBlock key={j} edit={edit} defaultExpanded={expanded} />
                         ))}
                       </div>
                     )}
@@ -206,6 +236,7 @@ export default function PromptEditorChat({ currentPrompt, gptSlug, onApplyPrompt
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Input */}
           <div className="border-t border-hex-dark-500 p-3 flex items-end gap-2">
             <textarea
               ref={inputRef}
