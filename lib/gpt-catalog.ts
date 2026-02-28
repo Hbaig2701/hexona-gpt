@@ -44,6 +44,30 @@ export const GPT_CATALOG: GPT[] = [
 
   // Sales & Revenue
   {
+    slug: "sales",
+    name: "Sales GPT",
+    description: "Generate outreach scripts, handle objections, and close deals with confidence.",
+    category: "sales",
+    scope: "both",
+    icon: "MessageSquare",
+    suggestedPrompts: [
+      "Write a cold email sequence for roofing companies",
+      "Give me a cold call script for selling AI voice agents",
+      "They said 'it's too expensive' — how do I respond?",
+      "Create a LinkedIn DM sequence for my niche",
+    ],
+    defaultModel: "claude-sonnet-4-6",
+    provider: "anthropic",
+    badge: "popular",
+    relatedGpts: ["pricing", "proposal", "niche-research"],
+    guide: [
+      "Covers outreach (cold emails, cold calls, LinkedIn DMs), objection handling, and closing strategies",
+      "Specify your niche so outreach scripts are relevant to your target audience",
+      "Paste an exact objection from a prospect to get a tailored response",
+      "Works with or without a client loaded — use it for generic scripts or client-specific outreach",
+    ],
+  },
+  {
     slug: "pricing",
     name: "Pricing GPT",
     description: "Get a confident, justified price for your proposal based on discovery call context.",
@@ -86,30 +110,6 @@ export const GPT_CATALOG: GPT[] = [
       "Share the problem being solved and your agreed pricing for the most tailored output",
       "Output is formatted in clean markdown — copy it into Google Docs for final formatting",
       "Best used after Pricing GPT so you already have a confident price to include",
-    ],
-  },
-  {
-    slug: "sales",
-    name: "Sales GPT",
-    description: "Generate outreach scripts, handle objections, and close deals with confidence.",
-    category: "sales",
-    scope: "both",
-    icon: "MessageSquare",
-    suggestedPrompts: [
-      "Write a cold email sequence for roofing companies",
-      "Give me a cold call script for selling AI voice agents",
-      "They said 'it's too expensive' — how do I respond?",
-      "Create a LinkedIn DM sequence for my niche",
-    ],
-    defaultModel: "claude-sonnet-4-6",
-    provider: "anthropic",
-    badge: "popular",
-    relatedGpts: ["pricing", "proposal", "niche-research"],
-    guide: [
-      "Covers outreach (cold emails, cold calls, LinkedIn DMs), objection handling, and closing strategies",
-      "Specify your niche so outreach scripts are relevant to your target audience",
-      "Paste an exact objection from a prospect to get a tailored response",
-      "Works with or without a client loaded — use it for generic scripts or client-specific outreach",
     ],
   },
 
