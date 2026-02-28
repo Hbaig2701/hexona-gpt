@@ -1,15 +1,23 @@
-import { Resend } from "resend";
+import Mailgun from "mailgun.js";
+import FormData from "form-data";
 
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY);
+function getMailgunClient() {
+  const mailgun = new Mailgun(FormData);
+  return mailgun.client({
+    username: "api",
+    key: process.env.MAILGUN_API_KEY || "",
+  });
 }
+
+const FROM = process.env.EMAIL_FROM || "noreply@hexonasystems.com";
+const DOMAIN = process.env.MAILGUN_DOMAIN || "hexonasystems.com";
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
 
-  await getResend().emails.send({
-    from: process.env.EMAIL_FROM || "noreply@hexonasystems.com",
-    to: email,
+  await getMailgunClient().messages.create(DOMAIN, {
+    from: FROM,
+    to: [email],
     subject: "Reset your Hexona GPT password",
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
@@ -29,9 +37,9 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 }
 
 export async function sendWelcomeEmail(email: string, name: string) {
-  await getResend().emails.send({
-    from: process.env.EMAIL_FROM || "noreply@hexonasystems.com",
-    to: email,
+  await getMailgunClient().messages.create(DOMAIN, {
+    from: FROM,
+    to: [email],
     subject: "Welcome to Hexona GPT",
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
