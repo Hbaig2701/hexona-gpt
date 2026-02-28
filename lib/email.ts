@@ -9,8 +9,8 @@ function getMailgunClient() {
   });
 }
 
-const FROM = process.env.EMAIL_FROM || "noreply@hexonasystems.com";
-const DOMAIN = process.env.MAILGUN_DOMAIN || "hexonasystems.com";
+const FROM = process.env.EMAIL_FROM || "hexonagpt@hexonasystems.com";
+const DOMAIN = process.env.MAILGUN_DOMAIN || "mg.hexonasystems.com";
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
