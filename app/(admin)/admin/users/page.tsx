@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, ToggleLeft, ToggleRight } from "lucide-react";
+import { Search, ToggleLeft, ToggleRight, RefreshCw } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
@@ -23,8 +23,10 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (filter !== "all") params.set("filter", filter);
@@ -33,7 +35,7 @@ export default function AdminUsersPage() {
       .then((r) => r.json())
       .then((data) => { if (Array.isArray(data)) setUsers(data); })
       .finally(() => setLoading(false));
-  }, [search, filter]);
+  }, [search, filter, refreshKey]);
 
   async function toggleActive(userId: string, currentState: boolean) {
     await fetch(`/api/admin/users/${userId}`, {
@@ -48,9 +50,18 @@ export default function AdminUsersPage() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h1 className="font-display text-2xl font-bold text-hex-text-primary mb-6">
-        User Management
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-bold text-hex-text-primary">
+          User Management
+        </h1>
+        <button
+          onClick={() => setRefreshKey((k) => k + 1)}
+          className="p-2 text-hex-text-muted hover:text-hex-teal transition-colors rounded-lg hover:bg-hex-dark-600"
+          title="Refresh data"
+        >
+          <RefreshCw size={18} />
+        </button>
+      </div>
 
       <div className="flex gap-3 mb-4">
         <div className="flex-1 relative">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
+import { RefreshCw } from "lucide-react";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -20,6 +21,7 @@ export default function AdminAnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [period, setPeriod] = useState("30d");
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -27,7 +29,7 @@ export default function AdminAnalyticsPage() {
       .then((r) => r.json())
       .then(setData)
       .finally(() => setLoading(false));
-  }, [period]);
+  }, [period, refreshKey]);
 
   if (loading) return <div className="max-w-5xl mx-auto animate-pulse h-64 bg-hex-dark-700 rounded-lg" />;
   if (!data) return null;
@@ -39,7 +41,16 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold text-hex-text-primary">Analytics</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-2xl font-bold text-hex-text-primary">Analytics</h1>
+          <button
+            onClick={() => setRefreshKey((k) => k + 1)}
+            className="p-2 text-hex-text-muted hover:text-hex-teal transition-colors rounded-lg hover:bg-hex-dark-600"
+            title="Refresh data"
+          >
+            <RefreshCw size={18} />
+          </button>
+        </div>
         <select
           value={period}
           onChange={(e) => setPeriod(e.target.value)}

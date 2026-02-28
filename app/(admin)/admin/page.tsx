@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
-import { Users, Brain, BarChart3, MessageSquare } from "lucide-react";
+import { Users, Brain, BarChart3, MessageSquare, RefreshCw } from "lucide-react";
 
 interface AdminStats {
   totalUsers: number;
@@ -14,13 +14,15 @@ interface AdminStats {
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    setStats(null);
     fetch("/api/admin/analytics?period=30d&summary=true")
       .then((r) => r.json())
       .then(setStats)
       .catch(() => {});
-  }, []);
+  }, [refreshKey]);
 
   const cards = [
     {
@@ -59,9 +61,18 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h1 className="font-display text-2xl font-bold text-hex-text-primary mb-6">
-        Admin Dashboard
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-bold text-hex-text-primary">
+          Admin Dashboard
+        </h1>
+        <button
+          onClick={() => setRefreshKey((k) => k + 1)}
+          className="p-2 text-hex-text-muted hover:text-hex-teal transition-colors rounded-lg hover:bg-hex-dark-600"
+          title="Refresh data"
+        >
+          <RefreshCw size={18} />
+        </button>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {cards.map((card) => (

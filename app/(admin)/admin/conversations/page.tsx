@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import MessageBubble from "@/components/chat/MessageBubble";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { GPT_CATALOG } from "@/lib/gpt-catalog";
 import { Suspense } from "react";
 
@@ -45,6 +45,7 @@ function ConversationViewerContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [filterGpt, setFilterGpt] = useState("");
   const [filterUser, setFilterUser] = useState(initialUserId || "");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -59,7 +60,7 @@ function ConversationViewerContent() {
         setTotalPages(data.totalPages || 1);
       })
       .finally(() => setLoading(false));
-  }, [page, filterGpt, filterUser]);
+  }, [page, filterGpt, filterUser, refreshKey]);
 
   async function openConversation(id: string) {
     const res = await fetch(`/api/admin/conversations?id=${id}`);
@@ -69,7 +70,16 @@ function ConversationViewerContent() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="font-display text-2xl font-bold text-hex-text-primary mb-6">Conversation Viewer</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-bold text-hex-text-primary">Conversation Viewer</h1>
+        <button
+          onClick={() => setRefreshKey((k) => k + 1)}
+          className="p-2 text-hex-text-muted hover:text-hex-teal transition-colors rounded-lg hover:bg-hex-dark-600"
+          title="Refresh data"
+        >
+          <RefreshCw size={18} />
+        </button>
+      </div>
 
       {/* Filters */}
       <div className="flex gap-3 mb-4">
