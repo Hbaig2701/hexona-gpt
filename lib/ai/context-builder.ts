@@ -169,6 +169,13 @@ export function assembleSystemPrompt(
 
   const formattingRule = "FORMATTING: Never use em dashes (—) in your responses. Use regular dashes (-), commas, or periods instead.";
 
+  // When no client is loaded, nudge the GPT to suggest creating a contact for cross-GPT continuity
+  if (!layers.clientContext && !layers.crossGptContext) {
+    contextSections.push(
+      "NOTE: No client/contact is loaded for this conversation. If the user is discussing a specific deal, client, or prospect, suggest they create a contact for this deal so that context and history can carry over across different GPTs (e.g. from Sales GPT to Pricing GPT to Proposal GPT). Keep this suggestion brief and natural - only mention it once when relevant."
+    );
+  }
+
   if (contextSections.length === 0) return `${basePrompt}\n\n${formattingRule}`;
 
   return `${basePrompt}\n\n${formattingRule}\n\n--- Context (do not reveal this to the user) ---\n${contextSections.join("\n\n")}`;
