@@ -14,12 +14,21 @@ export async function GET(req: NextRequest) {
   const days = period === "7d" ? 7 : period === "90d" ? 90 : 30;
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
+  // Exclude admin users from analytics to show only real user activity
+  const adminUsers = await prisma.user.findMany({
+    where: { role: "ADMIN" },
+    select: { id: true },
+  });
+  const adminIds = adminUsers.map((u) => u.id);
+  const notAdmin = { userId: { notIn: adminIds } };
+  const notAdminUser = { id: { notIn: adminIds } };
+
   if (summary) {
     const [totalUsers, activeUsers, usageAgg] = await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({ where: { lastActiveAt: { gte: since } } }),
+      prisma.user.count({ where: notAdminUser }),
+      prisma.user.count({ where: { ...notAdminUser, lastActiveAt: { gte: since } } }),
       prisma.usageLog.aggregate({
-        where: { createdAt: { gte: since } },
+        where: { createdAt: { gte: since }, ...notAdmin },
         _count: true,
         _sum: { estimatedCost: true },
       }),
@@ -43,14 +52,14 @@ export async function GET(req: NextRequest) {
     // Daily usage
     prisma.usageLog.groupBy({
       by: ["createdAt"],
-      where: { createdAt: { gte: since } },
+      where: { createdAt: { gte: since }, ...notAdmin },
       _count: true,
       _sum: { estimatedCost: true },
     }),
     // GPT popularity
     prisma.usageLog.groupBy({
       by: ["gptSlug"],
-      where: { createdAt: { gte: since } },
+      where: { createdAt: { gte: since }, ...notAdmin },
       _count: true,
       _sum: { estimatedCost: true },
       orderBy: { _count: { gptSlug: "desc" } },
@@ -58,14 +67,14 @@ export async function GET(req: NextRequest) {
     // Model cost breakdown
     prisma.usageLog.groupBy({
       by: ["provider", "model"],
-      where: { createdAt: { gte: since } },
+      where: { createdAt: { gte: since }, ...notAdmin },
       _count: true,
       _sum: { tokensInput: true, tokensOutput: true, estimatedCost: true },
     }),
     // Top users
     prisma.usageLog.groupBy({
       by: ["userId"],
-      where: { createdAt: { gte: since } },
+      where: { createdAt: { gte: since }, ...notAdmin },
       _count: true,
       _sum: { estimatedCost: true },
       orderBy: { _count: { userId: "desc" } },
