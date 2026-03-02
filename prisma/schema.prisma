@@ -61,6 +61,7 @@ model Client {
   status        ClientStatus @default(PROSPECT)
   notes         String?
   contactName   String?
+  contactRole   String?
   contactEmail  String?
 
   conversations Conversation[]

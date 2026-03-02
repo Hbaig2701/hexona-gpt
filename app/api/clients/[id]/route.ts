@@ -40,6 +40,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       website: body.website?.trim(),
       industry: body.industry?.trim(),
       contactName: body.contactName?.trim(),
+      contactRole: body.contactRole?.trim(),
       contactEmail: body.contactEmail?.trim(),
       notes: body.notes?.trim(),
       status: body.status,

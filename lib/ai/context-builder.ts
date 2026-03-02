@@ -56,6 +56,8 @@ export async function buildContextLayers({
     const parts = [`Client: ${client.businessName}`];
     if (client.industry) parts.push(`Industry: ${client.industry}`);
     if (client.website) parts.push(`Website: ${client.website}`);
+    if (client.contactName) parts.push(`Contact: ${client.contactName}`);
+    if (client.contactRole) parts.push(`Role/Title: ${client.contactRole}`);
     parts.push(`Status: ${client.status}`);
     if (client.notes) parts.push(`Notes: ${client.notes}`);
     clientContext = parts.join(". ") + ".";

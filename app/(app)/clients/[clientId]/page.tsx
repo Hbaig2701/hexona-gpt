@@ -18,6 +18,7 @@ interface ClientData {
   industry?: string;
   status: string;
   contactName?: string;
+  contactRole?: string;
   contactEmail?: string;
   notes?: string;
   conversations: { id: string; gptSlug: string; title?: string; updatedAt: string }[];
@@ -165,11 +166,17 @@ export default function ClientDashboardPage() {
                 onChange={(e) => setEditForm({ ...editForm, contactName: e.target.value })}
               />
               <Input
-                label="Contact Email"
-                value={editForm.contactEmail || ""}
-                onChange={(e) => setEditForm({ ...editForm, contactEmail: e.target.value })}
+                label="Contact Role / Title"
+                value={editForm.contactRole || ""}
+                onChange={(e) => setEditForm({ ...editForm, contactRole: e.target.value })}
+                placeholder="e.g., CEO, Owner, Marketing Director"
               />
             </div>
+            <Input
+              label="Contact Email"
+              value={editForm.contactEmail || ""}
+              onChange={(e) => setEditForm({ ...editForm, contactEmail: e.target.value })}
+            />
             <div>
               <label className="block text-sm font-medium text-[var(--hex-text-secondary)] mb-1.5">Notes</label>
               <textarea

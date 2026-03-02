@@ -16,10 +16,11 @@ export default function MessageBubble({ role, content, streaming }: MessageBubbl
   const markdownRef = useRef<HTMLDivElement>(null);
 
   function handleCopy() {
-    // Copy as rich text (HTML) so it pastes nicely into Google Docs, Word, etc.
-    // Falls back to plain text if clipboard API doesn't support HTML.
+    // Copy as rich text (HTML) so it pastes nicely into Google Docs, Gmail, etc.
+    // Wrap in a light-themed container so pasted content doesn't carry the dark background.
     if (markdownRef.current) {
-      const html = markdownRef.current.innerHTML;
+      const innerHtml = markdownRef.current.innerHTML;
+      const html = `<div style="background:#ffffff;color:#000000;font-family:sans-serif;font-size:14px;line-height:1.6">${innerHtml}</div>`;
       const plainText = markdownRef.current.innerText;
       try {
         navigator.clipboard.write([

@@ -13,6 +13,7 @@ interface Client {
   industry?: string;
   status: string;
   contactName?: string;
+  contactRole?: string;
   contactEmail?: string;
   updatedAt: string;
 }
@@ -72,7 +73,7 @@ export default function ClientsPage() {
                 <div>
                   <p className="text-[var(--hex-text-primary)] font-medium">{client.businessName}</p>
                   <p className="text-[var(--hex-text-muted)] text-sm">
-                    {[client.industry, client.contactName].filter(Boolean).join(" • ") || "No details"}
+                    {[client.industry, client.contactName && client.contactRole ? `${client.contactName} (${client.contactRole})` : client.contactName].filter(Boolean).join(" • ") || "No details"}
                   </p>
                 </div>
                 <Badge variant={statusVariant[client.status] || "default"}>

@@ -21,6 +21,7 @@ export default function NewClientPage() {
     website: "",
     industry: "",
     contactName: "",
+    contactRole: "",
     contactEmail: "",
     notes: "",
   });
@@ -153,13 +154,19 @@ export default function NewClientPage() {
                 placeholder="John Smith"
               />
               <Input
-                label="Contact Email"
-                type="email"
-                value={form.contactEmail}
-                onChange={(e) => update("contactEmail", e.target.value)}
-                placeholder="john@example.com"
+                label="Contact Role / Title"
+                value={form.contactRole}
+                onChange={(e) => update("contactRole", e.target.value)}
+                placeholder="e.g., CEO, Owner, Marketing Director"
               />
             </div>
+            <Input
+              label="Contact Email"
+              type="email"
+              value={form.contactEmail}
+              onChange={(e) => update("contactEmail", e.target.value)}
+              placeholder="john@example.com"
+            />
             <div>
               <label className="block text-sm font-medium text-[var(--hex-text-secondary)] mb-1.5">Notes</label>
               <textarea

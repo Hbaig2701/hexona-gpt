@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       website: body.website?.trim() || null,
       industry: body.industry?.trim() || null,
       contactName: body.contactName?.trim() || null,
+      contactRole: body.contactRole?.trim() || null,
       contactEmail: body.contactEmail?.trim() || null,
       notes: body.notes?.trim() || null,
       status: body.status || "PROSPECT",
