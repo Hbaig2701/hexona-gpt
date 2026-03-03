@@ -36,14 +36,18 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
   const searchParams = useSearchParams();
   const initialConversationId = searchParams.get("conversation");
 
+  const MESSAGES_PER_PAGE = 20;
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(initialConversationId);
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(MESSAGES_PER_PAGE);
   const freshChatRef = useRef(false); // true when user explicitly clicks "+ New"
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Smooth streaming buffer
@@ -249,17 +253,36 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
     }
   }, [gptSlug, clientId, conversationId, loading, flushBuffer]);
 
+  // Compute visible slice of messages (show most recent N)
+  const hiddenCount = Math.max(0, messages.length - visibleCount);
+  const visibleMessages = messages.slice(hiddenCount);
+
+  function loadMoreMessages() {
+    const container = scrollContainerRef.current;
+    const prevHeight = container?.scrollHeight || 0;
+    setVisibleCount((prev) => prev + MESSAGES_PER_PAGE);
+    // Preserve scroll position after loading older messages
+    requestAnimationFrame(() => {
+      if (container) {
+        const newHeight = container.scrollHeight;
+        container.scrollTop += newHeight - prevHeight;
+      }
+    });
+  }
+
   function startNewConversation() {
     freshChatRef.current = true;
     setMessages([]);
     setConversationId(null);
     setStreamingContent("");
+    setVisibleCount(MESSAGES_PER_PAGE);
   }
 
   function loadConversation(id: string) {
     setMessages([]);
     setConversationId(id);
     setShowHistory(false);
+    setVisibleCount(MESSAGES_PER_PAGE);
   }
 
   return (
@@ -296,7 +319,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-4">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto py-4 space-y-4">
         {messages.length === 0 && !streamingContent && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <p className="text-[var(--hex-text-secondary)] mb-6">
@@ -308,12 +331,23 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
           </div>
         )}
 
-        {messages.map((msg, index) => (
+        {hiddenCount > 0 && (
+          <div className="flex justify-center">
+            <button
+              onClick={loadMoreMessages}
+              className="px-4 py-2 text-xs text-hex-teal hover:text-white bg-[var(--hex-dark-600)] hover:bg-[var(--hex-dark-500)] border border-[var(--hex-dark-500)] rounded-full transition-colors"
+            >
+              Load earlier messages ({hiddenCount} more)
+            </button>
+          </div>
+        )}
+
+        {visibleMessages.map((msg, index) => (
           <div key={msg.id}>
             <MessageBubble role={msg.role} content={msg.content} />
             {msg.role === "assistant" &&
               msg.content.length > 200 &&
-              index === messages.length - 1 &&
+              hiddenCount + index === messages.length - 1 &&
               !loading && (
                 <HandoffChips gptSlug={gptSlug} clientId={clientId} />
               )}
