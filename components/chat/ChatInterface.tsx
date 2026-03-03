@@ -36,7 +36,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
   const searchParams = useSearchParams();
   const initialConversationId = searchParams.get("conversation");
 
-  const MESSAGES_PER_PAGE = 20;
+  const MESSAGES_PER_PAGE = 10;
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(initialConversationId);
