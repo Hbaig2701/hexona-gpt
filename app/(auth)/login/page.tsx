@@ -44,6 +44,10 @@ export default function LoginPage() {
         Sign in to your account
       </h2>
 
+      <div className="p-3 rounded-lg bg-hex-teal/10 border border-hex-teal/20 text-[var(--hex-text-secondary)] text-sm mb-4">
+        You need a separate login for HEXONA GPT than your Hexona Systems access. Please register below and create a new account just for HEXONA GPT.
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           label="Email"
