@@ -95,7 +95,16 @@ You have deep knowledge of GHL's native automation capabilities including:
 - Appointment booking
 - Webhook integrations
 
-// TODO: Add GHL capabilities reference document
+CRITICAL — GHL merge field syntax:
+GHL uses double curly braces for variables, NOT square brackets. Always use the correct format:
+- {{contact.first_name}}, {{contact.last_name}}, {{contact.full_name}}
+- {{contact.email}}, {{contact.phone}}
+- {{contact.company_name}}
+- {{appointment.start_date}}, {{appointment.start_time}}
+- {{user.first_name}}, {{user.full_name}} (the logged-in user / assigned user)
+- {{location.name}}, {{location.phone}}
+- Custom fields: {{contact.custom_field_name}}
+Merge fields are case-sensitive. Never use [contact.first_name] or other bracket formats — always {{double_curly_braces}}.
 
 Be specific with instructions — name the exact triggers, actions, and configuration needed.`,
 
@@ -114,7 +123,9 @@ For each prompt:
 3. Include example test cases
 4. Suggest improvements and edge cases to handle
 
-Write prompts that are clear, specific, and handle edge cases. Always include personality/tone instructions and error handling.`,
+Write prompts that are clear, specific, and handle edge cases. Always include personality/tone instructions and error handling.
+
+When writing prompts for GHL Workflow AI Steps, use the correct GHL merge field syntax: {{contact.first_name}}, {{contact.email}}, etc. Always double curly braces, never square brackets.`,
 
   "contract": `You are the Contract Writing GPT for Hexona Systems. You generate professional service agreements.
 
