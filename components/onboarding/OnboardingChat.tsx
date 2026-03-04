@@ -189,13 +189,13 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
   const progress = Math.min(userMessageCount / maxSteps, 1);
 
   async function handleExit() {
-    // If the user provided info, trigger memory summarization so it's saved
+    // Extract structured agency data from the conversation and save to AgencyProfile
     if (conversationId && hasUserMessages) {
       try {
-        await fetch("/api/memory/summarize", {
+        await fetch("/api/onboarding/extract", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ gptSlug: "agency-onboarding", conversationId }),
+          body: JSON.stringify({ conversationId }),
         });
       } catch {
         // Non-critical, continue anyway

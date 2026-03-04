@@ -127,7 +127,7 @@ export async function buildContextLayers({
       }
 
       if (sections.length > 0) {
-        crossGptContext = `Prior work done with this contact in other GPTs (use this for continuity - do not repeat questions already answered here):\n${sections.join("\n\n")}`;
+        crossGptContext = `PRIOR WORK with this contact from other GPTs. This contains decisions, research, and context already gathered. USE this information directly - do NOT re-ask questions already answered here. Confirm what you know and build on it:\n${sections.join("\n\n")}`;
       }
     } catch {
       // Cross-GPT context is optional, fail silently
