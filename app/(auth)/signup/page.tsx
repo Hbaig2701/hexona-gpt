@@ -62,7 +62,17 @@ export default function SignupPage() {
       if (signInRes?.error) {
         router.push("/login");
       } else {
-        router.push("/onboarding");
+        // Verify the session cookie was actually stored by the browser
+        const sessionCheck = await fetch("/api/auth/session");
+        const sessionData = await sessionCheck.json();
+
+        if (!sessionData?.user) {
+          setError(
+            "Your account was created, but your browser is blocking cookies required for login. This usually happens when using the app inside another platform. Please try opening the app in a new browser tab directly, or allow third-party cookies in your browser settings."
+          );
+        } else {
+          router.push("/onboarding");
+        }
       }
     } catch {
       setError("Something went wrong. Please try again.");

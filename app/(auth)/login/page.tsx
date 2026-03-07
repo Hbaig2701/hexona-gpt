@@ -29,7 +29,17 @@ export default function LoginPage() {
       if (res?.error) {
         setError(res.error);
       } else {
-        router.push("/dashboard");
+        // Verify the session cookie was actually stored by the browser
+        const sessionCheck = await fetch("/api/auth/session");
+        const sessionData = await sessionCheck.json();
+
+        if (!sessionData?.user) {
+          setError(
+            "Your browser is blocking cookies required for login. This usually happens when using the app inside another platform. Please try opening the app in a new browser tab directly, or allow third-party cookies in your browser settings."
+          );
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch {
       setError("Something went wrong. Please try again.");

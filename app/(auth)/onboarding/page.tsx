@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
@@ -25,6 +25,7 @@ function OnboardingInner() {
   const searchParams = useSearchParams();
   const resuming = searchParams.get("resume") === "1";
   const [step, setStep] = useState<Step>(resuming ? "interview" : "welcome");
+  const [sessionError, setSessionError] = useState(false);
   const [agencyData, setAgencyData] = useState<AgencyData>({
     niche: "",
     services: [],
@@ -36,12 +37,40 @@ function OnboardingInner() {
     biggestChallenge: "",
   });
 
+  // Verify session is valid before starting onboarding
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.user) setSessionError(true);
+      })
+      .catch(() => setSessionError(true));
+  }, []);
+
   async function saveProfile(data: AgencyData) {
     await fetch("/api/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, completedAt: new Date().toISOString() }),
     });
+  }
+
+  if (sessionError) {
+    return (
+      <div className="min-h-screen bg-[var(--hex-dark-900)] hex-pattern flex items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <h2 className="font-display text-xl font-semibold text-[var(--hex-text-primary)] mb-4">
+            Session Not Found
+          </h2>
+          <p className="text-[var(--hex-text-secondary)] text-sm mb-6">
+            Your browser is blocking cookies required for authentication. This usually happens when using the app inside another platform. Please try opening the app in a new browser tab directly, or allow third-party cookies in your browser settings.
+          </p>
+          <Button onClick={() => router.push("/login")}>
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
