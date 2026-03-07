@@ -129,7 +129,10 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
         }),
       });
 
-      if (!res.ok) throw new Error("Chat request failed");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: `Request failed (${res.status})` }));
+        throw new Error(err.error || `Request failed (${res.status})`);
+      }
 
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -157,12 +160,18 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
                   fullContent += parsed.content;
                   pushToBuffer(fullContent);
                 }
+                if (parsed.error) {
+                  throw new Error(parsed.error);
+                }
                 if (parsed.agencyData) {
                   onComplete(parsed.agencyData);
                   return;
                 }
-              } catch {
-                // partial JSON, skip
+              } catch (e) {
+                // Re-throw real errors, skip partial JSON
+                if (e instanceof Error && !e.message.includes("JSON")) {
+                  throw e;
+                }
               }
             }
           }
@@ -173,10 +182,13 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
       setStreamingContent("");
       setMessages((prev) => [...prev, { role: "assistant", content: fullContent }]);
     } catch (error) {
-      console.error("Chat error:", error);
+      console.error("Onboarding chat error:", error);
+      resetBuffer();
+      setStreamingContent("");
+      const errMessage = error instanceof Error ? error.message : "Unknown error";
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, something went wrong. Could you try again?" },
+        { role: "assistant", content: `Sorry, something went wrong: ${errMessage}. Please try again.` },
       ]);
     } finally {
       setLoading(false);

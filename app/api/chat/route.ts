@@ -43,7 +43,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "Invalid request body" }), { status: 400 });
+  }
   const { gptSlug, clientId, conversationId, message, attachments } = body;
 
   if (!gptSlug || !message?.trim()) {
@@ -51,19 +56,31 @@ export async function POST(req: NextRequest) {
   }
 
   // Get GPT config from DB, fall back to defaults
-  const gptConfig = await prisma.gptConfig.findUnique({ where: { gptSlug } });
+  let gptConfig: Awaited<ReturnType<typeof prisma.gptConfig.findUnique>> = null;
+  try {
+    gptConfig = await prisma.gptConfig.findUnique({ where: { gptSlug } });
+  } catch (e) {
+    console.error("Failed to fetch GPT config:", e);
+    // Continue without config — will use defaults
+  }
 
   if (gptConfig && !gptConfig.isActive) {
     return new Response(JSON.stringify({ error: "This GPT is currently unavailable" }), { status: 403 });
   }
 
   // Build context layers
-  const contextLayers = await buildContextLayers({
-    userId: session.user.id,
-    gptSlug,
-    clientId,
-    userMessage: message,
-  });
+  let contextLayers;
+  try {
+    contextLayers = await buildContextLayers({
+      userId: session.user.id,
+      gptSlug,
+      clientId,
+      userMessage: message,
+    });
+  } catch (e) {
+    console.error("Context build failed:", e);
+    return new Response(JSON.stringify({ error: "Failed to build context. Please try again." }), { status: 500 });
+  }
 
   // Get system prompt
   const basePrompt = gptConfig?.systemPrompt || getDefaultSystemPrompt(gptSlug);
