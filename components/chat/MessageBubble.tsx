@@ -5,13 +5,20 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Copy, Check } from "lucide-react";
 
+interface MessageImage {
+  base64Data: string;
+  mediaType: string;
+  fileName: string;
+}
+
 interface MessageBubbleProps {
   role: "user" | "assistant";
   content: string;
+  images?: MessageImage[];
   streaming?: boolean;
 }
 
-export default function MessageBubble({ role, content, streaming }: MessageBubbleProps) {
+export default function MessageBubble({ role, content, images, streaming }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const markdownRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +61,21 @@ export default function MessageBubble({ role, content, streaming }: MessageBubbl
         }`}
       >
         {isUser ? (
-          <p className="whitespace-pre-wrap">{content}</p>
+          <div>
+            {images && images.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {images.map((img, i) => (
+                  <img
+                    key={i}
+                    src={`data:${img.mediaType};base64,${img.base64Data}`}
+                    alt={img.fileName}
+                    className="max-w-[200px] max-h-[200px] rounded-lg object-cover"
+                  />
+                ))}
+              </div>
+            )}
+            <p className="whitespace-pre-wrap">{content}</p>
+          </div>
         ) : (
           <div className="markdown-content" ref={markdownRef}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>

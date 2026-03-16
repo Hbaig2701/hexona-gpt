@@ -13,10 +13,17 @@ import { Eye, History, Plus } from "lucide-react";
 import Button from "@/components/ui/Button";
 import GptGuideModal from "./GptGuideModal";
 
+interface MessageImage {
+  base64Data: string;
+  mediaType: string;
+  fileName: string;
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  images?: MessageImage[];
   createdAt?: string;
 }
 
@@ -132,17 +139,38 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
     }
   }, [conversationId]);
 
+  // Track whether user is near the bottom of the scroll container
+  const isNearBottomRef = useRef(true);
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    function handleScroll() {
+      const { scrollTop, scrollHeight, clientHeight } = container!;
+      isNearBottomRef.current = scrollHeight - scrollTop - clientHeight < 100;
+    }
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (isNearBottomRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, streamingContent]);
 
   const handleSend = useCallback(async (text: string, attachments?: AttachmentData[]) => {
     if (!text.trim() || loading) return;
 
+    const imageData = attachments
+      ?.filter((a) => a.type === "image" && a.base64Data && a.mediaType)
+      .map((a) => ({ base64Data: a.base64Data!, mediaType: a.mediaType!, fileName: a.fileName }));
+
     const userMsg: Message = {
       id: `temp-${Date.now()}`,
       role: "user",
       content: text,
+      images: imageData && imageData.length > 0 ? imageData : undefined,
     };
 
     // Optimistic UI
@@ -346,7 +374,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
 
         {visibleMessages.map((msg, index) => (
           <div key={msg.id}>
-            <MessageBubble role={msg.role} content={msg.content} />
+            <MessageBubble role={msg.role} content={msg.content} images={msg.images} />
             {msg.role === "assistant" &&
               msg.content.length > 200 &&
               hiddenCount + index === messages.length - 1 &&
