@@ -19,7 +19,12 @@ export async function POST(req: NextRequest) {
       where: { email: email.toLowerCase().trim() },
     });
 
-    if (!user) return successResponse;
+    if (!user) {
+      console.log(`[Password Reset] No user found for email: ${email}`);
+      return successResponse;
+    }
+
+    console.log(`[Password Reset] User found: ${user.email} (ID: ${user.id})`);
 
     // Generate secure token
     const token = crypto.randomBytes(32).toString("hex");
@@ -33,7 +38,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await sendPasswordResetEmail(user.email, token);
+    console.log(`[Password Reset] Token created for user: ${user.email}`);
+
+    try {
+      await sendPasswordResetEmail(user.email, token);
+      console.log(`[Password Reset] Email sent successfully to: ${user.email}`);
+    } catch (emailError) {
+      console.error(`[Password Reset] Failed to send email to ${user.email}:`, emailError);
+      // Still return success to prevent email enumeration, but log the error
+    }
 
     return successResponse;
   } catch (error) {

@@ -24,6 +24,8 @@ interface AttachmentData {
   type: string;
   fileName: string;
   extractedText: string;
+  base64Data?: string;
+  mediaType?: string;
 }
 
 interface ChatInterfaceProps {

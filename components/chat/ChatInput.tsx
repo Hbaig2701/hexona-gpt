@@ -7,6 +7,8 @@ interface AttachmentData {
   type: string;
   fileName: string;
   extractedText: string;
+  base64Data?: string;
+  mediaType?: string;
 }
 
 interface AttachmentFile {
@@ -99,6 +101,7 @@ export default function ChatInput({ onSend, onStop, loading }: ChatInputProps) {
                     type: isAudio ? "voice_note" : data.type || "text",
                     fileName: file.name,
                     extractedText: data.extractedText || data.transcript || "",
+                    ...(data.type === "image" && { base64Data: data.base64Data, mediaType: data.mediaType }),
                   },
                 }
               : a
@@ -164,7 +167,7 @@ export default function ChatInput({ onSend, onStop, loading }: ChatInputProps) {
           ref={fileInputRef}
           type="file"
           onChange={handleFileSelect}
-          accept=".pdf,.doc,.docx,.txt,.md,.mp3,.m4a,.wav,.webm,.ogg"
+          accept=".pdf,.doc,.docx,.txt,.md,.mp3,.m4a,.wav,.webm,.ogg,.jpg,.jpeg,.png,.gif,.webp"
           multiple
           className="hidden"
         />

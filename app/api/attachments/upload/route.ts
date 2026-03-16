@@ -47,6 +47,22 @@ export async function POST(req: NextRequest) {
   } else if (name.endsWith(".txt") || name.endsWith(".md")) {
     type = "text";
     extractedText = buffer.toString("utf-8");
+  } else if (/\.(jpg|jpeg|png|gif|webp)$/.test(name)) {
+    type = "image";
+    const base64Data = buffer.toString("base64");
+    const ext = name.split(".").pop()!;
+    const mediaType = ext === "jpg" || ext === "jpeg" ? "image/jpeg"
+      : ext === "png" ? "image/png"
+      : ext === "gif" ? "image/gif"
+      : "image/webp";
+
+    return NextResponse.json({
+      type,
+      fileName: file.name,
+      base64Data,
+      mediaType,
+      size: file.size,
+    });
   } else {
     return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
   }

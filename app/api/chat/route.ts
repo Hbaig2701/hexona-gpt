@@ -101,12 +101,44 @@ export async function POST(req: NextRequest) {
 
   // Build attachment context
   let messageWithAttachments = message;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let multimodalContent: any[] | null = null;
+
   if (attachments?.length) {
-    const attachmentTexts = attachments.map(
-      (a: { type: string; fileName: string; extractedText: string }) =>
-        `[Attached ${a.type}: ${a.fileName}]\n${a.extractedText}`
+    const imageAttachments = attachments.filter(
+      (a: { type: string }) => a.type === "image"
     );
-    messageWithAttachments = `${message}\n\n${attachmentTexts.join("\n\n")}`;
+    const textAttachments = attachments.filter(
+      (a: { type: string }) => a.type !== "image"
+    );
+
+    // Append text-based attachments to message as before
+    if (textAttachments.length > 0) {
+      const attachmentTexts = textAttachments.map(
+        (a: { type: string; fileName: string; extractedText: string }) =>
+          `[Attached ${a.type}: ${a.fileName}]\n${a.extractedText}`
+      );
+      messageWithAttachments = `${message}\n\n${attachmentTexts.join("\n\n")}`;
+    }
+
+    // Build multimodal content blocks for images
+    if (imageAttachments.length > 0) {
+      multimodalContent = [];
+      for (const img of imageAttachments) {
+        multimodalContent.push({
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: (img as { mediaType: string }).mediaType,
+            data: (img as { base64Data: string }).base64Data,
+          },
+        });
+      }
+      multimodalContent.push({
+        type: "text",
+        text: messageWithAttachments,
+      });
+    }
   }
 
   // Save user message
@@ -140,7 +172,8 @@ export async function POST(req: NextRequest) {
   // Reverse to chronological order
   recentMessages.reverse();
 
-  const chatMessages: { role: "user" | "assistant"; content: string }[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chatMessages: { role: "user" | "assistant"; content: string | any[] }[] = [];
 
   // If there are older messages beyond our window, inject the summary as context
   if (totalMessageCount > RECENT_MESSAGE_COUNT && conversation?.summary) {
@@ -165,7 +198,7 @@ export async function POST(req: NextRequest) {
   if (attachments?.length && chatMessages.length > 0) {
     chatMessages[chatMessages.length - 1] = {
       role: "user",
-      content: messageWithAttachments,
+      content: multimodalContent || messageWithAttachments,
     };
   }
 
@@ -250,10 +283,13 @@ export async function POST(req: NextRequest) {
           onError(error) {
             console.error("Stream error:", error.message, { provider: routing.provider, model: routing.model });
             // Surface a useful error message instead of a generic one
+            const isServerError = error.message?.includes("500") || error.message?.includes("503") || error.message?.includes("529") || error.message?.includes("overloaded");
             const userMessage = error.message?.includes("rate")
               ? "Rate limit reached. Please wait a moment and try again."
               : error.message?.includes("context_length") || error.message?.includes("too many tokens")
               ? "This conversation is too long. Please start a new conversation."
+              : isServerError
+              ? `Our AI provider is currently experiencing issues. You can check [status.claude.com](https://status.claude.com) for updates. Please try again later.`
               : `Something went wrong (${routing.provider}). Please try again.`;
             controller.enqueue(
               encoder.encode(

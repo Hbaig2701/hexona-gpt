@@ -52,7 +52,8 @@ export async function streamChat({
   provider: string;
   model: string;
   systemPrompt: string;
-  messages: { role: "user" | "assistant"; content: string }[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  messages: { role: "user" | "assistant"; content: string | any[] }[];
   temperature?: number;
   callbacks: StreamCallbacks;
 }) {
@@ -86,15 +87,35 @@ export async function streamChat({
 
       for (const { client, model: clientModel } of clients) {
         try {
+          // Convert multimodal content blocks to OpenAI format
+          const openaiMessages = messages.map((m) => {
+            if (Array.isArray(m.content)) {
+              return {
+                role: m.role,
+                content: m.content.map((block: { type: string; text?: string; source?: { type: string; media_type: string; data: string } }) => {
+                  if (block.type === "image") {
+                    return {
+                      type: "image_url" as const,
+                      image_url: { url: `data:${block.source!.media_type};base64,${block.source!.data}` },
+                    };
+                  }
+                  return { type: "text" as const, text: block.text || "" };
+                }),
+              };
+            }
+            return { role: m.role, content: m.content };
+          });
+
           const stream = await client.chat.completions.create({
             model: clientModel,
             temperature: temperature ?? 0.7,
             max_tokens: 4096,
             stream: true,
             messages: [
-              { role: "system", content: systemPrompt },
-              ...messages,
-            ],
+              { role: "system" as const, content: systemPrompt },
+              ...openaiMessages,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ] as any,
           });
 
           let totalTokens = 0;
@@ -108,7 +129,7 @@ export async function streamChat({
           }
 
           const inputEstimate = Math.ceil(systemPrompt.length / 4) +
-            messages.reduce((sum, m) => sum + Math.ceil(m.content.length / 4), 0);
+            messages.reduce((sum, m) => sum + Math.ceil(typeof m.content === "string" ? m.content.length / 4 : 1000), 0);
           callbacks.onDone({
             inputTokens: inputEstimate,
             outputTokens: totalTokens * 4,
