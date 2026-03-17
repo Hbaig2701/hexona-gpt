@@ -145,13 +145,13 @@ export async function buildContextLayers({
     if (gptConfig?.knowledgeDocs?.length) {
       // Import dynamically to avoid circular deps
       const { searchKnowledgeChunks } = await import("./rag");
-      const chunks = await searchKnowledgeChunks(gptSlug, userMessage, 3);
+      const chunks = await searchKnowledgeChunks(gptSlug, userMessage, 8);
       if (chunks.length > 0) {
-        ragContext = "Relevant reference material:\n" + chunks.map((c) => c.content).join("\n---\n");
+        ragContext = "REFERENCE MATERIAL FROM KNOWLEDGE BASE (use this as your primary source of truth for feature names, triggers, actions, and platform details - prioritize this over your training data when there is a conflict):\n" + chunks.map((c) => c.content).join("\n---\n");
       }
     }
-  } catch {
-    // RAG not available yet (pgvector not set up), skip silently
+  } catch (error) {
+    console.error(`[RAG] Knowledge base search failed for ${gptSlug}:`, error);
   }
 
   return { agencyContext, memoryContext, clientContext, crossGptContext, ragContext };

@@ -66,7 +66,7 @@ export async function searchKnowledgeChunks(
     LIMIT ${topK}
   `;
 
-  return results.filter((r) => r.score > 0.3); // Filter low relevance
+  return results.filter((r) => r.score > 0.2); // Filter low relevance (lower threshold to include more context)
 }
 
 export async function deleteDocumentChunks(documentId: string): Promise<void> {
