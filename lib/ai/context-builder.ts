@@ -142,12 +142,28 @@ export async function buildContextLayers({
       select: { knowledgeDocs: { select: { id: true } } },
     });
 
+    console.log(`[RAG] GPT: ${gptSlug}, knowledge docs found: ${gptConfig?.knowledgeDocs?.length || 0}`);
+
     if (gptConfig?.knowledgeDocs?.length) {
-      // Import dynamically to avoid circular deps
-      const { searchKnowledgeChunks } = await import("./rag");
-      const chunks = await searchKnowledgeChunks(gptSlug, userMessage, 8);
-      if (chunks.length > 0) {
-        ragContext = "REFERENCE MATERIAL FROM KNOWLEDGE BASE (use this as your primary source of truth for feature names, triggers, actions, and platform details - prioritize this over your training data when there is a conflict):\n" + chunks.map((c) => c.content).join("\n---\n");
+      // Check if chunks actually exist
+      const chunkCount = await prisma.$queryRaw<[{ count: bigint }]>`
+        SELECT COUNT(*) as count FROM "KnowledgeChunk" kc
+        JOIN "KnowledgeDocument" kd ON kc."documentId" = kd.id
+        WHERE kd."gptSlug" = ${gptSlug}
+      `;
+      console.log(`[RAG] Total chunks indexed for ${gptSlug}: ${chunkCount[0]?.count || 0}`);
+
+      if (Number(chunkCount[0]?.count || 0) === 0) {
+        console.warn(`[RAG] Knowledge docs exist but NO chunks indexed for ${gptSlug} - documents need re-indexing`);
+      } else {
+        // Import dynamically to avoid circular deps
+        const { searchKnowledgeChunks } = await import("./rag");
+        const chunks = await searchKnowledgeChunks(gptSlug, userMessage, 8);
+        console.log(`[RAG] Search returned ${chunks.length} chunks for query: "${userMessage.slice(0, 80)}..."`);
+        if (chunks.length > 0) {
+          console.log(`[RAG] Top chunk score: ${chunks[0].score}, lowest: ${chunks[chunks.length - 1].score}`);
+          ragContext = "REFERENCE MATERIAL FROM KNOWLEDGE BASE (use this as your primary source of truth for feature names, triggers, actions, and platform details - prioritize this over your training data when there is a conflict):\n" + chunks.map((c) => c.content).join("\n---\n");
+        }
       }
     }
   } catch (error) {

@@ -31,16 +31,21 @@ export async function indexDocument(documentId: string): Promise<number> {
   if (!doc) throw new Error("Document not found");
 
   const chunks = chunkText(doc.content);
+  console.log(`[RAG Index] Document "${doc.name}" (${documentId}): ${doc.content.length} chars -> ${chunks.length} chunks`);
 
   // Process chunks in batches
   let chunkIndex = 0;
   for (const chunk of chunks) {
     const embedding = await generateEmbedding(chunk);
 
-    // Use raw SQL for pgvector insert
+    // Convert embedding array to pgvector string format: [0.1, 0.2, ...]
+    // Prisma serializes JS arrays as PostgreSQL arrays {0.1, 0.2} which can't be cast to vector
+    const embeddingStr = `[${embedding.join(",")}]`;
+    const chunkId = `chunk-${documentId}-${chunkIndex}`;
+
     await prisma.$executeRaw`
       INSERT INTO "KnowledgeChunk" (id, "documentId", content, embedding, "chunkIndex")
-      VALUES (${`chunk-${documentId}-${chunkIndex}`}, ${documentId}, ${chunk}, ${embedding}::vector, ${chunkIndex})
+      VALUES (${chunkId}, ${documentId}, ${chunk}, ${embeddingStr}::vector, ${chunkIndex})
     `;
 
     chunkIndex++;
@@ -56,13 +61,16 @@ export async function searchKnowledgeChunks(
 ): Promise<{ content: string; score: number }[]> {
   const queryEmbedding = await generateEmbedding(query);
 
+  // Convert to pgvector string format (JS arrays serialize as PostgreSQL arrays which can't cast to vector)
+  const queryEmbeddingStr = `[${queryEmbedding.join(",")}]`;
+
   // Use pgvector similarity search
   const results = await prisma.$queryRaw<{ content: string; score: number }[]>`
-    SELECT kc.content, 1 - (kc.embedding <=> ${queryEmbedding}::vector) as score
+    SELECT kc.content, 1 - (kc.embedding <=> ${queryEmbeddingStr}::vector) as score
     FROM "KnowledgeChunk" kc
     JOIN "KnowledgeDocument" kd ON kc."documentId" = kd.id
     WHERE kd."gptSlug" = ${gptSlug}
-    ORDER BY kc.embedding <=> ${queryEmbedding}::vector
+    ORDER BY kc.embedding <=> ${queryEmbeddingStr}::vector
     LIMIT ${topK}
   `;
 
