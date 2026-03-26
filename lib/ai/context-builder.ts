@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
+import { GPT_CATALOG } from "@/lib/gpt-catalog";
 
 interface ContextLayers {
   agencyContext: string;
@@ -186,6 +187,10 @@ export function assembleSystemPrompt(
   ].filter(Boolean);
 
   const formattingRule = "FORMATTING: Never use em dashes (—) in your responses. Use regular dashes (-), commas, or periods instead.";
+
+  // Add GPT directory so models never hallucinate GPT names
+  const gptDirectory = GPT_CATALOG.map(g => `- ${g.name} (${g.description})`).join("\n");
+  contextSections.push(`AVAILABLE GPTs IN HEXONA (ONLY refer users to these - NEVER invent GPT names that are not on this list):\n${gptDirectory}`);
 
   // When no client is loaded, nudge the GPT to suggest creating a contact for cross-GPT continuity
   if (!layers.clientContext && !layers.crossGptContext) {
