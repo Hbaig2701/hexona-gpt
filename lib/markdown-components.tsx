@@ -37,16 +37,20 @@ export const markdownComponents = {
   },
 };
 
-// Defensive autolinker: turn bare /gpts/<slug>, /clients/<id>, etc. into real
-// markdown links. Models often write the path as plain text instead of using
-// proper [text](url) syntax — this catches those so the path is still clickable.
+// Defensive autolinker: turn bare /advisors/<slug>, /clients/<id>, etc. into
+// real markdown links. Models often write the path as plain text instead of
+// using proper [text](url) syntax — this catches those so the path is still
+// clickable.
+//
+// Includes legacy /gpts/<slug> so older assistant responses still linkify
+// (those URLs 308-redirect to /advisors/<slug> at request time).
 //
 // Skips:
-// - Paths already inside markdown link URL portion: ](/gpts/...)
-// - Paths inside markdown link text portion: [/gpts/...](...)
-// - Paths that are part of a longer URL: example.com/gpts/...
+// - Paths already inside markdown link URL portion: ](/advisors/...)
+// - Paths inside markdown link text portion: [/advisors/...](...)
+// - Paths that are part of a longer URL: example.com/advisors/...
 // - Paths inside backtick code spans or fenced code blocks (preserved as code)
-const INTERNAL_PATH_RE = /(?<!\]\()(?<![\[a-zA-Z0-9.])\/(?:gpts|clients|admin|dashboard|settings)\/[a-z0-9_-]+(?:\/[a-z0-9_-]+)*/gi;
+const INTERNAL_PATH_RE = /(?<!\]\()(?<![\[a-zA-Z0-9.])\/(?:advisors|gpts|clients|admin|dashboard|settings)\/[a-z0-9_-]+(?:\/[a-z0-9_-]+)*/gi;
 
 // Splits content into alternating prose and code spans (single backtick or
 // fenced triple backtick). Odd-indexed parts are code and must be left alone.

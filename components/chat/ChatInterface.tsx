@@ -6,7 +6,7 @@ import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 import ContextBadge from "./ContextBadge";
 import ConversationHistory from "./ConversationHistory";
-import SuggestedPrompts from "@/components/gpts/SuggestedPrompts";
+import SuggestedPrompts from "@/components/advisors/SuggestedPrompts";
 import HandoffChips from "./HandoffChips";
 import { getGptBySlug } from "@/lib/gpt-catalog";
 import { Eye, History, Plus } from "lucide-react";

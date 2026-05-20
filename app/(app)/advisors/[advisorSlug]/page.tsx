@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import * as LucideIcons from "lucide-react";
 import ChatInterface from "@/components/chat/ChatInterface";
-import ContactPickerInterstitial from "@/components/gpts/ContactPickerInterstitial";
+import ContactPickerInterstitial from "@/components/advisors/ContactPickerInterstitial";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { GPT_CATEGORIES, getGptBySlug, getGptsByCategory, type GPTCategory } from "@/lib/gpt-catalog";
@@ -28,7 +28,7 @@ function CategoryView({ category }: { category: GPTCategory }) {
         {gpts.map((gpt) => {
           const Icon = (LucideIcons as unknown as Record<string, React.ElementType>)[gpt.icon] || LucideIcons.Zap;
           return (
-            <Link key={gpt.slug} href={`/gpts/${gpt.slug}`}>
+            <Link key={gpt.slug} href={`/advisors/${gpt.slug}`}>
               <Card className="cursor-pointer flex items-start gap-4">
                 <div
                   className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
@@ -61,7 +61,7 @@ function CategoryView({ category }: { category: GPTCategory }) {
 
 export default function GptPage() {
   const params = useParams();
-  const slug = params.gptSlug as string;
+  const slug = params.advisorSlug as string;
 
   // Check if it's a valid GPT first (takes priority over category if slug matches both)
   const gpt = getGptBySlug(slug);

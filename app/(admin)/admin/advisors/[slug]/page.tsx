@@ -120,7 +120,7 @@ export default function AdminGptConfigPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <BackLink href="/admin/gpts" label="Back to GPTs" className="mb-4" />
+      <BackLink href="/admin/advisors" label="Back to Advisors" className="mb-4" />
       <div className="flex items-center gap-3 mb-6">
         <h1 className="font-display text-2xl font-bold text-hex-text-primary">{slug}</h1>
         <Badge variant={config.isActive ? "success" : "error"}>

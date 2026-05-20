@@ -10,11 +10,11 @@ interface HandoffChipsProps {
   messageContent: string;
 }
 
-// Match /gpts/<slug> paths in assistant message content. Same regex shape used
-// by linkifyInternalPaths so behavior is consistent. Returns unique slugs in
-// the order they appear.
+// Match /advisors/<slug> (and legacy /gpts/<slug>) paths in assistant message
+// content. Same regex shape used by linkifyInternalPaths so behavior is
+// consistent. Returns unique slugs in the order they appear.
 function extractReferencedSlugs(content: string, currentSlug: string): string[] {
-  const re = /\/gpts\/([a-z0-9_-]+)/gi;
+  const re = /\/(?:advisors|gpts)\/([a-z0-9_-]+)/gi;
   const seen = new Set<string>();
   const slugs: string[] = [];
   let match;
@@ -41,8 +41,8 @@ export default function HandoffChips({ gptSlug, clientId, messageContent }: Hand
       {slugs.map((slug) => {
         const gpt = getGptBySlug(slug)!;
         const href = clientId
-          ? `/clients/${clientId}/gpts/${slug}`
-          : `/gpts/${slug}`;
+          ? `/clients/${clientId}/advisors/${slug}`
+          : `/advisors/${slug}`;
 
         return (
           <Link

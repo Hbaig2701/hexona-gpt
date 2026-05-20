@@ -40,7 +40,7 @@ export default function AdminGptsPage() {
         {gpts.map((gpt) => {
           const cat = GPT_CATEGORIES[gpt.category as keyof typeof GPT_CATEGORIES];
           return (
-            <Link key={gpt.slug} href={`/admin/gpts/${gpt.slug}`}>
+            <Link key={gpt.slug} href={`/admin/advisors/${gpt.slug}`}>
               <Card className="cursor-pointer flex items-center justify-between py-3">
                 <div className="flex items-center gap-3">
                   <div

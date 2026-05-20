@@ -208,7 +208,7 @@ export default function Sidebar() {
                     <button
                       onClick={() => toggleCategory(key)}
                       className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm transition-colors ${
-                        isActivePrefix(`/gpts/${key}`)
+                        isActivePrefix(`/advisors/${key}`)
                           ? "text-hex-teal"
                           : "text-[var(--hex-text-secondary)] hover:text-[var(--hex-text-primary)] hover:bg-hex-dark-700"
                       }`}
@@ -232,8 +232,8 @@ export default function Sidebar() {
                           {getGptsByCategory(key as GPTCategory).map((gpt) => (
                             <Link
                               key={gpt.slug}
-                              href={`/gpts/${gpt.slug}`}
-                              className={navLinkClass(isActive(`/gpts/${gpt.slug}`))}
+                              href={`/advisors/${gpt.slug}`}
+                              className={navLinkClass(isActive(`/advisors/${gpt.slug}`))}
                             >
                               <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
                               <span className="truncate">{gpt.name}</span>

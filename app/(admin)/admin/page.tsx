@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
       value: "9",
       subtitle: "Advisors configured",
       icon: Brain,
-      href: "/admin/gpts",
+      href: "/admin/advisors",
       color: "#F59E0B",
     },
     {
@@ -98,7 +98,7 @@ export default function AdminDashboardPage() {
             <p className="text-hex-text-muted text-sm">Manage users, toggle access, reset passwords</p>
           </Card>
         </Link>
-        <Link href="/admin/gpts">
+        <Link href="/admin/advisors">
           <Card className="cursor-pointer">
             <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-1">Advisor Configuration</h3>
             <p className="text-hex-text-muted text-sm">Edit system prompts, knowledge base, settings</p>

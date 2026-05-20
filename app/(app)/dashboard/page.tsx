@@ -122,7 +122,7 @@ export default function DashboardPage() {
             {recentConversations.map((conv) => {
               const gpt = GPT_CATALOG.find((g) => g.slug === conv.gptSlug);
               return (
-                <Link key={conv.id} href={conv.client ? `/clients/${conv.client.id}/gpts/${conv.gptSlug}?conversation=${conv.id}` : `/gpts/${conv.gptSlug}?conversation=${conv.id}`}>
+                <Link key={conv.id} href={conv.client ? `/clients/${conv.client.id}/advisors/${conv.gptSlug}?conversation=${conv.id}` : `/advisors/${conv.gptSlug}?conversation=${conv.id}`}>
                   <Card className="cursor-pointer !p-6 h-full">
                     <p className="text-base text-hex-teal font-semibold">{gpt?.name || conv.gptSlug}</p>
                     <p className="text-[var(--hex-text-primary)] text-sm mt-1.5 truncate">
@@ -159,7 +159,7 @@ export default function DashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(Object.entries(GPT_CATEGORIES) as [string, { label: string; icon: string; color: string }][]).map(
             ([key, cat]) => (
-              <Link key={key} href={`/gpts/${key}`}>
+              <Link key={key} href={`/advisors/${key}`}>
                 <Card className="cursor-pointer flex items-center gap-5 !p-6">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
@@ -191,7 +191,7 @@ function GPTQuickCard({ gpt }: { gpt: GPT }) {
   const category = GPT_CATEGORIES[gpt.category];
 
   return (
-    <Link href={`/gpts/${gpt.slug}`}>
+    <Link href={`/advisors/${gpt.slug}`}>
       <Card className="cursor-pointer h-full !p-6">
         <div className="flex items-start justify-between mb-4">
           <div

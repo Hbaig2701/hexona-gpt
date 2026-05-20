@@ -50,7 +50,7 @@ export default function MessageBubble({ role, content, images, streaming }: Mess
   const isUser = role === "user";
 
   // Strip Perplexity-style citation references like [1], [2][3], then defensively
-  // wrap bare /gpts/<slug>-style internal paths so they render as real links.
+  // wrap bare /advisors/<slug>-style internal paths so they render as real links.
   const cleanContent = isUser
     ? content
     : linkifyInternalPaths(content.replace(/\[\d+\]/g, ""));

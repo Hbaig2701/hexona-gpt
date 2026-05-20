@@ -215,7 +215,7 @@ export default function ClientDashboardPage() {
           </h2>
           <div className="space-y-2">
             {client.conversations.map((conv) => (
-              <Link key={conv.id} href={`/clients/${clientId}/gpts/${conv.gptSlug}?conversation=${conv.id}`}>
+              <Link key={conv.id} href={`/clients/${clientId}/advisors/${conv.gptSlug}?conversation=${conv.id}`}>
                 <Card className="cursor-pointer py-3">
                   <div className="flex items-center justify-between">
                     <div>
@@ -243,7 +243,7 @@ function ClientGPTCard({ gpt, clientId }: { gpt: GPT; clientId: string }) {
   const category = GPT_CATEGORIES[gpt.category];
 
   return (
-    <Link href={`/clients/${clientId}/gpts/${gpt.slug}`}>
+    <Link href={`/clients/${clientId}/advisors/${gpt.slug}`}>
       <Card className="cursor-pointer h-full">
         <div className="flex items-start gap-3">
           <div

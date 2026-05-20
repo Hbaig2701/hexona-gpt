@@ -82,7 +82,7 @@ export default function ContactPickerInterstitial({ gpt }: { gpt: GPT }) {
             filtered.map((contact) => (
               <button
                 key={contact.id}
-                onClick={() => router.push(`/clients/${contact.id}/gpts/${gpt.slug}`)}
+                onClick={() => router.push(`/clients/${contact.id}/advisors/${gpt.slug}`)}
                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left hover:bg-[var(--hex-dark-700)] transition-colors"
               >
                 <div className="min-w-0">
@@ -111,7 +111,7 @@ export default function ContactPickerInterstitial({ gpt }: { gpt: GPT }) {
           variant="secondary"
           className="w-full"
           onClick={() =>
-            router.push(`/clients/new?redirectTo=/clients/{clientId}/gpts/${gpt.slug}`)
+            router.push(`/clients/new?redirectTo=/clients/{clientId}/advisors/${gpt.slug}`)
           }
         >
           <Plus size={16} /> Create new contact

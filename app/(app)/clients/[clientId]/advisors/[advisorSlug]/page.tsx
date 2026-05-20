@@ -7,7 +7,7 @@ import ChatInterface from "@/components/chat/ChatInterface";
 export default function ClientGptChatPage() {
   const params = useParams();
   const clientId = params.clientId as string;
-  const gptSlug = params.gptSlug as string;
+  const gptSlug = params.advisorSlug as string;
   const [clientName, setClientName] = useState<string>("");
 
   useEffect(() => {

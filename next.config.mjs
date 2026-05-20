@@ -20,6 +20,16 @@ const nextConfig = {
       },
     ];
   },
+  // Legacy /gpts/* URLs from before the Agency Advisory rebrand 308-redirect
+  // to /advisors/* so old bookmarks, chat history references, and external
+  // links keep working.
+  async redirects() {
+    return [
+      { source: "/gpts/:slug*", destination: "/advisors/:slug*", permanent: true },
+      { source: "/clients/:clientId/gpts/:slug*", destination: "/clients/:clientId/advisors/:slug*", permanent: true },
+      { source: "/admin/gpts/:slug*", destination: "/admin/advisors/:slug*", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
