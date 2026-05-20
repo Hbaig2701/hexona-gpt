@@ -383,10 +383,9 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
           <div key={msg.id}>
             <MessageBubble role={msg.role} content={msg.content} images={msg.images} />
             {msg.role === "assistant" &&
-              msg.content.length > 200 &&
               hiddenCount + index === messages.length - 1 &&
               !loading && (
-                <HandoffChips gptSlug={gptSlug} clientId={clientId} />
+                <HandoffChips gptSlug={gptSlug} clientId={clientId} messageContent={msg.content} />
               )}
           </div>
         ))}

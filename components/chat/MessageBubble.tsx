@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Copy, Check } from "lucide-react";
+import { markdownComponents, linkifyInternalPaths } from "@/lib/markdown-components";
 
 interface MessageImage {
   base64Data: string;
@@ -48,8 +49,11 @@ export default function MessageBubble({ role, content, images, streaming }: Mess
 
   const isUser = role === "user";
 
-  // Strip Perplexity-style citation references like [1], [2][3], etc.
-  const cleanContent = isUser ? content : content.replace(/\[\d+\]/g, "");
+  // Strip Perplexity-style citation references like [1], [2][3], then defensively
+  // wrap bare /gpts/<slug>-style internal paths so they render as real links.
+  const cleanContent = isUser
+    ? content
+    : linkifyInternalPaths(content.replace(/\[\d+\]/g, ""));
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} group`}>
@@ -78,7 +82,7 @@ export default function MessageBubble({ role, content, images, streaming }: Mess
           </div>
         ) : (
           <div className="markdown-content" ref={markdownRef}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
               {cleanContent}
             </ReactMarkdown>
             {streaming && (

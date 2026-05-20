@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Button from "@/components/ui/Button";
+import { markdownComponents, linkifyInternalPaths } from "@/lib/markdown-components";
 
 interface AgencyData {
   niche: string;
@@ -258,8 +259,8 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
                 <p className="whitespace-pre-wrap">{msg.content}</p>
               ) : (
                 <div className="markdown-content">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {msg.content}
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                    {linkifyInternalPaths(msg.content)}
                   </ReactMarkdown>
                 </div>
               )}
@@ -270,8 +271,8 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-xl px-4 py-3 text-sm card-base border-l-2 border-l-hex-teal/30">
               <div className="markdown-content">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {streamingContent}
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                  {linkifyInternalPaths(streamingContent)}
                 </ReactMarkdown>
               </div>
               <span className="inline-block w-1.5 h-4 bg-hex-teal animate-pulse ml-0.5 align-middle" />

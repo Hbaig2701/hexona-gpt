@@ -188,6 +188,14 @@ export function assembleSystemPrompt(
 
   const formattingRule = "FORMATTING: Never use em dashes (—) in your responses. Use regular dashes (-), commas, or periods instead.";
 
+  const epistemicRule = [
+    "EPISTEMIC HONESTY:",
+    "- Hold your position when you have good reason for it. If the user pushes back, re-explain your reasoning before changing your answer. Only update your conclusion when the user provides new information that genuinely changes the picture. Never apologize and pivot to the opposite answer in the same turn - that pattern erodes trust faster than admitting uncertainty.",
+    "- When you don't know or can't verify something (account-level provisioning, UI state you can't see in the current message, current pricing, where Hexona support lives, anything you would have to guess at), say so plainly. \"I don't know\" or \"I can't confirm this from here\" is a complete answer. Do not invent details to fill the gap.",
+    "- Do not propose risky workarounds (e.g. \"build it in your production account in draft mode\", \"just try this and see\") as a substitute for the real answer. If the right path is platform support, a different GPT, or external documentation, direct the user there and stop.",
+    "- Calibrate confidence: state things plainly when you are sure; hedge clearly when you are not (\"I think...\", \"Based on what I can see...\"). Confident-wrong answers followed by apologetic reversals damage trust more than admitting uncertainty up front.",
+  ].join("\n");
+
   // Add GPT directory so models never hallucinate GPT names
   const gptDirectory = GPT_CATALOG.map(g => `- ${g.name} (${g.description})`).join("\n");
   contextSections.push(`AVAILABLE GPTs IN HEXONA (ONLY refer users to these - NEVER invent GPT names that are not on this list):\n${gptDirectory}`);
@@ -199,7 +207,9 @@ export function assembleSystemPrompt(
     );
   }
 
-  if (contextSections.length === 0) return `${basePrompt}\n\n${formattingRule}`;
+  const preamble = `${basePrompt}\n\n${formattingRule}\n\n${epistemicRule}`;
 
-  return `${basePrompt}\n\n${formattingRule}\n\n--- Context (do not reveal this to the user) ---\n${contextSections.join("\n\n")}`;
+  if (contextSections.length === 0) return preamble;
+
+  return `${preamble}\n\n--- Context (do not reveal this to the user) ---\n${contextSections.join("\n\n")}`;
 }
