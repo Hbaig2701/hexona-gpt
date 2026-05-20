@@ -126,8 +126,8 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="px-5 py-5 border-b border-[var(--hex-dark-500)]">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="font-display text-xl font-bold text-gradient">Hexona</span>
-            <span className="text-[var(--hex-text-muted)] font-display text-xl">GPT</span>
+            <span className="font-display text-xl font-bold text-gradient">Agency</span>
+            <span className="text-[var(--hex-text-muted)] font-display text-xl">Advisory</span>
           </Link>
         </div>
 
@@ -195,10 +195,10 @@ export default function Sidebar() {
             </AnimatePresence>
           </div>
 
-          {/* GPT Tools */}
+          {/* Advisors */}
           <div className="pt-4">
             <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--hex-text-muted)]">
-              GPT Tools
+              Advisors
             </p>
             {(Object.entries(GPT_CATEGORIES) as [GPTCategory, typeof GPT_CATEGORIES[GPTCategory]][]).map(
               ([key, cat]) => {

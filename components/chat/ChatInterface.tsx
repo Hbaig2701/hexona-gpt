@@ -337,7 +337,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
               <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center">
                 <Eye size={10} />
               </span>
-              What is this GPT best for?
+              What is this Advisor best for?
             </button>
           )}
           {clientName && (

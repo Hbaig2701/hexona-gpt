@@ -154,7 +154,7 @@ export default function DashboardPage() {
       {/* All Categories */}
       <div>
         <h2 className="font-display text-xl font-semibold text-[var(--hex-text-primary)] mb-4">
-          All GPT tools
+          All Advisors
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(Object.entries(GPT_CATEGORIES) as [string, { label: string; icon: string; color: string }][]).map(

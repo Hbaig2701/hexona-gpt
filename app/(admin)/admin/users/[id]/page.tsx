@@ -207,10 +207,10 @@ export default function AdminUserDetailPage() {
         })()}
       </Card>
 
-      {/* GPT Usage */}
+      {/* Advisor Usage */}
       {user.gptUsage.length > 0 && (
         <Card hoverable={false}>
-          <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-3">GPT Usage</h3>
+          <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-3">Advisor Usage</h3>
           <div className="space-y-2">
             {user.gptUsage.map((g) => (
               <div key={g.gptSlug} className="flex justify-between text-sm">

@@ -195,10 +195,10 @@ export default function ClientDashboardPage() {
         </Card>
       )}
 
-      {/* Client-Scoped GPT Cards */}
+      {/* Client-Scoped Advisor Cards */}
       <div>
         <h2 className="font-display text-lg font-semibold text-[var(--hex-text-primary)] mb-3">
-          GPT Tools for {client.businessName}
+          Advisors for {client.businessName}
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {clientGpts.map((gpt) => (

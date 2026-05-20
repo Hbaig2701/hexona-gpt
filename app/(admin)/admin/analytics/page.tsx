@@ -114,9 +114,9 @@ export default function AdminAnalyticsPage() {
           </ResponsiveContainer>
         </Card>
 
-        {/* GPT Popularity */}
+        {/* Advisor Popularity */}
         <Card hoverable={false}>
-          <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-4">GPT Popularity</h3>
+          <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-4">Advisor Popularity</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={data.gptPopularity} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#2E3847" />
@@ -153,14 +153,14 @@ export default function AdminAnalyticsPage() {
         </Card>
       </div>
 
-      {/* Cost by GPT Table */}
+      {/* Cost by Advisor Table */}
       <Card hoverable={false}>
-        <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-4">Cost by GPT</h3>
+        <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-4">Cost by Advisor</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-hex-dark-500">
-                <th className="text-left py-2 text-hex-text-muted font-medium">GPT</th>
+                <th className="text-left py-2 text-hex-text-muted font-medium">Advisor</th>
                 <th className="text-right py-2 text-hex-text-muted font-medium">Messages</th>
                 <th className="text-right py-2 text-hex-text-muted font-medium">Est. Cost</th>
               </tr>

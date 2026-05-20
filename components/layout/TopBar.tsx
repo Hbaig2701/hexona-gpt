@@ -12,7 +12,8 @@ function getBreadcrumb(pathname: string): string {
   const labels: Record<string, string> = {
     dashboard: "Dashboard",
     clients: "Contacts",
-    gpts: "GPT Tools",
+    gpts: "Advisors",
+    advisors: "Advisors",
     settings: "Settings",
     admin: "Admin",
     new: "New",

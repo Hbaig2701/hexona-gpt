@@ -51,7 +51,7 @@ export default function ContactPickerInterstitial({ gpt }: { gpt: GPT }) {
             <Search size={22} className="text-hex-teal" />
           </div>
           <h2 className="font-display text-lg font-semibold text-[var(--hex-text-primary)]">
-            This GPT works with a specific contact
+            This Advisor works with a specific contact
           </h2>
           <p className="text-[var(--hex-text-muted)] text-sm mt-1">
             {gpt.name} needs to be linked to a contact to work properly. Pick an existing one or create a new one.

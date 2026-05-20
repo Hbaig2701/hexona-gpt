@@ -86,7 +86,7 @@ function OnboardingInner() {
           >
             <div className="mb-8">
               <h1 className="font-display text-4xl font-bold text-gradient mb-4">
-                Hexona GPT
+                Agency Advisory
               </h1>
             </div>
             <h2 className="font-display text-2xl md:text-3xl font-semibold text-[var(--hex-text-primary)] mb-3">

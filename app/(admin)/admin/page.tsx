@@ -34,9 +34,9 @@ export default function AdminDashboardPage() {
       color: "#00C4CC",
     },
     {
-      title: "GPT Config",
-      value: "13",
-      subtitle: "GPTs configured",
+      title: "Advisor Config",
+      value: "9",
+      subtitle: "Advisors configured",
       icon: Brain,
       href: "/admin/gpts",
       color: "#F59E0B",
@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
         </Link>
         <Link href="/admin/gpts">
           <Card className="cursor-pointer">
-            <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-1">GPT Configuration</h3>
+            <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-1">Advisor Configuration</h3>
             <p className="text-hex-text-muted text-sm">Edit system prompts, knowledge base, settings</p>
           </Card>
         </Link>

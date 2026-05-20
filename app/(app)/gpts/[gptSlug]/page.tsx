@@ -72,7 +72,7 @@ export default function GptPage() {
   }
 
   if (!gpt) {
-    return <p className="text-hex-text-muted text-center py-12">GPT not found</p>;
+    return <p className="text-hex-text-muted text-center py-12">Advisor not found</p>;
   }
 
   // Contact-scoped GPTs need a contact selected first

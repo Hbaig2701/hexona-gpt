@@ -55,7 +55,7 @@ export default function LoginPage() {
       </h2>
 
       <div className="p-3 rounded-lg bg-hex-teal/10 border border-hex-teal/20 text-[var(--hex-text-secondary)] text-sm mb-4">
-        You need a separate login for HEXONA GPT than your Hexona Systems access. Please register below and create a new account just for HEXONA GPT.
+        You need a separate login for Agency Advisory than your Hexona Systems access. Please register below and create a new account just for Agency Advisory.
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">

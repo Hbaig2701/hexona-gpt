@@ -21,8 +21,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hexona GPT",
-  description: "AI Agency Operating System — Your suite of specialized AI assistants.",
+  title: "Agency Advisory",
+  description: "AI Agency Operating System — Your suite of specialized AI advisors.",
 };
 
 export default function RootLayout({

@@ -4,7 +4,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md mx-auto px-4">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="font-display text-3xl font-bold text-gradient">Hexona GPT</h1>
+          <h1 className="font-display text-3xl font-bold text-gradient">Agency Advisory</h1>
           <p className="text-[var(--hex-text-secondary)] text-sm mt-2">
             AI Agency Operating System
           </p>

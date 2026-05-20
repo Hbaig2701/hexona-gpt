@@ -213,7 +213,7 @@ export default function AdminGptConfigPage() {
           {config.knowledgeDocs.length === 0 ? (
             <Card hoverable={false} className="text-center py-8">
               <p className="text-hex-text-muted">No knowledge documents yet</p>
-              <p className="text-xs text-hex-text-muted mt-1">Upload documents to enable RAG for this GPT</p>
+              <p className="text-xs text-hex-text-muted mt-1">Upload documents to enable RAG for this Advisor</p>
             </Card>
           ) : (
             <div className="space-y-2">

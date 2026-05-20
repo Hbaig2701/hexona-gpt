@@ -32,7 +32,7 @@ export default function AnnouncementBanner() {
       <div className="flex items-center justify-center gap-2 text-sm text-[var(--hex-text-primary)]">
         <Sparkles size={14} className="text-hex-teal flex-shrink-0" />
         <span className="font-medium">
-          New Updates Coming to HexonaGPT and All Agents This Week
+          New Updates Coming to Agency Advisory and All Advisors This Week
         </span>
       </div>
       <button

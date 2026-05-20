@@ -19,7 +19,7 @@ export const GPT_CATALOG: GPT[] = [
   // Research & Discovery
   {
     slug: "niche-research",
-    name: "Niche & Research GPT",
+    name: "Niche & Research Advisor",
     description: "Find the perfect niche and research prospects before your sales calls.",
     category: "research",
     scope: "both",
@@ -45,7 +45,7 @@ export const GPT_CATALOG: GPT[] = [
   // Sales & Revenue
   {
     slug: "sales",
-    name: "Sales GPT",
+    name: "Sales Advisor",
     description: "Generate outreach scripts, handle objections, and close deals with confidence.",
     category: "sales",
     scope: "both",
@@ -69,7 +69,7 @@ export const GPT_CATALOG: GPT[] = [
   },
   {
     slug: "pricing",
-    name: "Pricing GPT",
+    name: "Pricing Advisor",
     description: "Get a confident, justified price for your proposal based on discovery call context.",
     category: "sales",
     scope: "client",
@@ -92,7 +92,7 @@ export const GPT_CATALOG: GPT[] = [
   },
   {
     slug: "proposal",
-    name: "Proposal Writing GPT",
+    name: "Proposal Advisor",
     description: "Generate a professional, tailored proposal document for your client.",
     category: "sales",
     scope: "client",
@@ -104,19 +104,19 @@ export const GPT_CATALOG: GPT[] = [
     ],
     defaultModel: "claude-sonnet-4-6",
     provider: "anthropic",
-    relatedGpts: ["contract", "client-onboarding"],
+    relatedGpts: ["contract"],
     guide: [
       "Generates a full proposal: executive summary, solution, deliverables, timeline, pricing, and next steps",
       "Share the problem being solved and your agreed pricing for the most tailored output",
       "Output is formatted in clean markdown — copy it into Google Docs for final formatting",
-      "Best used after Pricing GPT so you already have a confident price to include",
+      "Best used after the Pricing Advisor so you already have a confident price to include",
     ],
   },
 
   // Fulfillment & Delivery
   {
     slug: "workflow",
-    name: "Workflow Builder GPT",
+    name: "Workflow Advisor",
     description: "Describe an automation use case and get step-by-step build instructions.",
     category: "fulfillment",
     scope: "global",
@@ -139,7 +139,7 @@ export const GPT_CATALOG: GPT[] = [
   },
   {
     slug: "prompt-engineer",
-    name: "Prompt Engineering GPT",
+    name: "Prompting Advisor",
     description: "Write effective prompts for voice agents, DM agents, and AI workflow steps.",
     category: "fulfillment",
     scope: "global",
@@ -161,7 +161,7 @@ export const GPT_CATALOG: GPT[] = [
   },
   {
     slug: "contract",
-    name: "Contract Writing GPT",
+    name: "Contract Advisor",
     description: "Generate a professional service agreement for your client engagement.",
     category: "fulfillment",
     scope: "client",
@@ -173,11 +173,11 @@ export const GPT_CATALOG: GPT[] = [
     ],
     defaultModel: "claude-haiku-4-5-20251001",
     provider: "anthropic",
-    relatedGpts: ["client-onboarding"],
+    relatedGpts: ["proposal"],
     guide: [
       "Generates a full service agreement: scope, timeline, pricing, revisions, termination, confidentiality, and liability",
       "Provide the agreed deliverables and payment terms for an accurate contract",
-      "Works best when you've already used Pricing GPT and Proposal GPT to lock in the details",
+      "Works best when you've already used Pricing Advisor and Proposal Advisor to lock in the details",
       "Important: output is a template — always have a licensed attorney review before sending",
     ],
   },
@@ -198,7 +198,7 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-sonnet-4-6",
     provider: "anthropic",
     badge: "pro",
-    relatedGpts: ["weekly-review", "niche-research"],
+    relatedGpts: ["niche-research"],
     guide: [
       "Like talking to an experienced agency owner — direct, no-BS, and focused on what moves the needle",
       "Share your current situation first so the advice is specific, not generic",
@@ -206,33 +206,11 @@ export const GPT_CATALOG: GPT[] = [
       "Best for big-picture questions: structuring your agency, pricing strategy, growth roadmap",
     ],
   },
-  {
-    slug: "weekly-review",
-    name: "Weekly Review GPT",
-    description: "End-of-week reflection tool. Share what happened and get a structured debrief.",
-    category: "strategy",
-    scope: "global",
-    icon: "CalendarCheck",
-    suggestedPrompts: [
-      "Here's what happened this week — help me debrief",
-      "I closed 2 deals but lost 1. Help me analyze.",
-      "What should I focus on next week?",
-    ],
-    defaultModel: "claude-haiku-4-5-20251001",
-    provider: "anthropic",
-    relatedGpts: ["hamza-ai"],
-    guide: [
-      "Share your week — deals closed, calls made, challenges faced, wins — and it gives you a structured debrief",
-      "Output is organized into: Wins, Learnings, Blockers, and Top 3 Priorities for next week",
-      "Be honest about setbacks so the analysis is constructive and useful",
-      "Use it weekly to build a reflection habit and spot patterns over time",
-    ],
-  },
 
   // Onboarding
   {
     slug: "agency-onboarding",
-    name: "Agency Onboarding",
+    name: "Onboarding Advisor",
     description: "Set up your agency profile through a friendly conversational interview.",
     category: "onboarding",
     scope: "global",
@@ -249,28 +227,6 @@ export const GPT_CATALOG: GPT[] = [
       "Covers: services you offer, target niche, location, revenue, goals, and biggest challenge",
       "Answer one question at a time — it's short and conversational",
       "You can exit anytime — even partial info helps personalize your experience",
-    ],
-  },
-  {
-    slug: "client-onboarding",
-    name: "Client Onboarding GPT",
-    description: "Generate a welcome sequence, onboarding checklist, and kickoff agenda for your client.",
-    category: "onboarding",
-    scope: "client",
-    icon: "UserPlus",
-    suggestedPrompts: [
-      "Help me onboard this new client",
-      "Create a welcome email and onboarding checklist",
-      "Generate a kickoff call agenda for this client",
-    ],
-    defaultModel: "claude-haiku-4-5-20251001",
-    provider: "anthropic",
-    relatedGpts: ["workflow", "prompt-engineer"],
-    guide: [
-      "Generates three things: a welcome email, an onboarding checklist, and a kickoff call agenda",
-      "Share the client's name, business, services purchased, and start date",
-      "Mention the client's tech comfort level so materials match their experience",
-      "Makes you look organized and professional from day one with a new client",
     ],
   },
 ];
@@ -292,9 +248,7 @@ export const MODEL_ROUTING: Record<string, { provider: string; model: string }> 
   "prompt-engineer": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "contract": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "hamza-ai": { provider: "anthropic", model: "claude-sonnet-4-6" },
-  "weekly-review": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "agency-onboarding": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
-  "client-onboarding": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
 };
 
 export function getGptBySlug(slug: string): GPT | undefined {
