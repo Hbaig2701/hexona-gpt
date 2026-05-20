@@ -8,6 +8,10 @@ interface ContextLayers {
   clientContext: string;
   crossGptContext: string;
   ragContext: string;
+  // Slugs of GPTs that are explicitly INACTIVE in the DB. assembleSystemPrompt
+  // filters these out of the GPT directory so the bot never routes users to
+  // a disabled GPT.
+  inactiveGptSlugs: string[];
 }
 
 export async function buildContextLayers({
@@ -21,14 +25,17 @@ export async function buildContextLayers({
   clientId?: string;
   userMessage: string;
 }): Promise<ContextLayers> {
-  const [profile, memory, client] = await Promise.all([
+  const [profile, memory, client, inactiveConfigs] = await Promise.all([
     // Layer 1: Agency Profile
     prisma.agencyProfile.findUnique({ where: { userId } }),
     // Layer 2: GPT Memory
     prisma.gptMemory.findUnique({ where: { userId_gptSlug: { userId, gptSlug } } }),
     // Layer 3: Client Context
     clientId ? prisma.client.findFirst({ where: { id: clientId, userId } }) : null,
+    // Inactive GPTs - so we can exclude them from the directory the bot sees
+    prisma.gptConfig.findMany({ where: { isActive: false }, select: { gptSlug: true } }),
   ]);
+  const inactiveGptSlugs = inactiveConfigs.map((c) => c.gptSlug);
 
   // Layer 1: Agency Profile
   let agencyContext = "";
@@ -172,12 +179,13 @@ export async function buildContextLayers({
     console.error(`[RAG] Knowledge base search failed for ${gptSlug}:`, error);
   }
 
-  return { agencyContext, memoryContext, clientContext, crossGptContext, ragContext };
+  return { agencyContext, memoryContext, clientContext, crossGptContext, ragContext, inactiveGptSlugs };
 }
 
 export function assembleSystemPrompt(
   basePrompt: string,
-  layers: ContextLayers
+  layers: ContextLayers,
+  currentGptSlug?: string
 ): string {
   const contextSections = [
     layers.agencyContext,
@@ -197,9 +205,17 @@ export function assembleSystemPrompt(
     "- Calibrate confidence: state things plainly when you are sure; hedge clearly when you are not (\"I think...\", \"Based on what I can see...\"). Confident-wrong answers followed by apologetic reversals damage trust more than admitting uncertainty up front.",
   ].join("\n");
 
-  // Add GPT directory so models never hallucinate GPT names
-  const gptDirectory = GPT_CATALOG.map(g => `- ${g.name} (${g.description})`).join("\n");
-  contextSections.push(`AVAILABLE GPTs IN HEXONA (ONLY refer users to these - NEVER invent GPT names that are not on this list):\n${gptDirectory}`);
+  // Add GPT directory so models never hallucinate GPT names. Filter out:
+  // (1) the current GPT - the user is already talking to it, no need to route to self
+  // (2) any GPT explicitly deactivated by an admin (gptConfig.isActive = false)
+  const inactive = new Set(layers.inactiveGptSlugs);
+  const gptDirectory = GPT_CATALOG
+    .filter((g) => g.slug !== currentGptSlug && !inactive.has(g.slug))
+    .map((g) => `- ${g.name} (${g.description})`)
+    .join("\n");
+  if (gptDirectory) {
+    contextSections.push(`AVAILABLE GPTs IN HEXONA (ONLY refer users to these - NEVER invent GPT names that are not on this list):\n${gptDirectory}`);
+  }
 
   // When no client is loaded, nudge the GPT to suggest creating a contact for cross-GPT continuity
   if (!layers.clientContext && !layers.crossGptContext) {

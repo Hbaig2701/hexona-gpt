@@ -51,7 +51,11 @@ export async function POST(req: NextRequest) {
   }
   const { gptSlug, clientId, conversationId, message, attachments } = body;
 
-  if (!gptSlug || !message?.trim()) {
+  // Allow attachment-only messages (e.g. "here's the screenshot of the error").
+  // gptSlug is always required; either message text or attachments must be present.
+  const hasMessage = typeof message === "string" && message.trim().length > 0;
+  const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
+  if (!gptSlug || (!hasMessage && !hasAttachments)) {
     return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
   }
 
@@ -75,7 +79,9 @@ export async function POST(req: NextRequest) {
       userId: session.user.id,
       gptSlug,
       clientId,
-      userMessage: message,
+      // RAG search uses the user's text. When the message is only attachments,
+      // pass an empty string - the RAG layer will skip retrieval gracefully.
+      userMessage: hasMessage ? message : "",
     });
   } catch (e) {
     console.error("Context build failed:", e);
@@ -84,7 +90,7 @@ export async function POST(req: NextRequest) {
 
   // Get system prompt
   const basePrompt = gptConfig?.systemPrompt || getDefaultSystemPrompt(gptSlug);
-  const fullSystemPrompt = assembleSystemPrompt(basePrompt, contextLayers);
+  const fullSystemPrompt = assembleSystemPrompt(basePrompt, contextLayers, gptSlug);
 
   // Get or create conversation
   let convId = conversationId;
@@ -99,8 +105,11 @@ export async function POST(req: NextRequest) {
     convId = conversation.id;
   }
 
-  // Build attachment context
-  let messageWithAttachments = message;
+  // Build attachment context. messageText is the user's text (may be empty
+  // when they only sent attachments); messageWithAttachments includes any
+  // text-attachment dumps appended.
+  const messageText: string = (typeof message === "string" ? message : "").trim();
+  let messageWithAttachments = messageText;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let multimodalContent: any[] | null = null;
 
@@ -112,13 +121,13 @@ export async function POST(req: NextRequest) {
       (a: { type: string }) => a.type !== "image"
     );
 
-    // Append text-based attachments to message as before
+    // Append text-based attachments to message
     if (textAttachments.length > 0) {
       const attachmentTexts = textAttachments.map(
         (a: { type: string; fileName: string; extractedText: string }) =>
           `[Attached ${a.type}: ${a.fileName}]\n${a.extractedText}`
       );
-      messageWithAttachments = `${message}\n\n${attachmentTexts.join("\n\n")}`;
+      messageWithAttachments = (messageText ? `${messageText}\n\n` : "") + attachmentTexts.join("\n\n");
     }
 
     // Build multimodal content blocks for images
@@ -134,19 +143,24 @@ export async function POST(req: NextRequest) {
           },
         });
       }
+      // Anthropic requires non-empty text blocks. Default when the user sent
+      // only image attachments with no caption.
       multimodalContent.push({
         type: "text",
-        text: messageWithAttachments,
+        text: messageWithAttachments || "[image attached - see above]",
       });
     }
   }
 
-  // Save user message
+  // Save user message. Use a placeholder for the DB row when the user sent
+  // attachments with no caption so the admin viewer doesn't show blank rows.
+  const persistedContent =
+    messageText || (attachments?.length ? "[attachment]" : "");
   await prisma.message.create({
     data: {
       conversationId: convId,
       role: "USER",
-      content: message,
+      content: persistedContent,
     },
   });
 
@@ -277,7 +291,7 @@ export async function POST(req: NextRequest) {
               select: { title: true },
             });
             if (!convForTitle?.title && messageCount >= 2) {
-              generateTitle(convId, message, fullResponse).catch((err) =>
+              generateTitle(convId, persistedContent, fullResponse).catch((err) =>
                 console.error("[generateTitle] failed:", err)
               );
             }

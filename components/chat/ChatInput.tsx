@@ -203,7 +203,7 @@ export default function ChatInput({ onSend, onStop, loading }: ChatInputProps) {
         ) : (
           <button
             onClick={handleSend}
-            disabled={!input.trim() && attachments.length === 0}
+            disabled={!input.trim() && !attachments.some((a) => a.data && !a.processing)}
             className="p-2.5 rounded-lg bg-gradient-to-br from-hex-teal to-[#0095A8] text-hex-dark-900 disabled:opacity-50 disabled:cursor-not-allowed teal-glow transition-all hover:opacity-90"
           >
             <Send size={18} />
