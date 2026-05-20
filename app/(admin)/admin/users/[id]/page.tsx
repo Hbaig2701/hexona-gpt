@@ -6,12 +6,16 @@ import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import BackLink from "@/components/ui/BackLink";
+
+type Tier = "TIER_0" | "TIER_1" | "TIER_2" | "TIER_3";
 
 interface UserDetail {
   id: string;
   name?: string;
   email: string;
   role: string;
+  tier: Tier;
   isActive: boolean;
   createdAt: string;
   lastActiveAt?: string;
@@ -21,9 +25,11 @@ interface UserDetail {
     location?: string;
     monthlyRevenue?: string;
     revenueGoal?: string;
+    experienceLevel?: string;
     background?: string;
     biggestChallenge?: string;
-  };
+    completedAt?: string;
+  } | null;
   _count: { conversations: number; clients: number };
   usageStats: { totalMessages: number; totalTokens: number; totalCost: number };
   gptUsage: { gptSlug: string; _count: number }[];
@@ -64,6 +70,16 @@ export default function AdminUserDetailPage() {
     setUser({ ...user, role: newRole });
   }
 
+  async function changeTier(newTier: Tier) {
+    if (!user || newTier === user.tier) return;
+    await fetch(`/api/admin/users/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tier: newTier }),
+    });
+    setUser({ ...user, tier: newTier });
+  }
+
   async function resetPassword() {
     if (!confirm("Send a password reset email to this user?")) return;
     await fetch(`/api/admin/users/${userId}`, {
@@ -85,6 +101,8 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      <BackLink href="/admin/users" label="Back to users" />
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -92,11 +110,25 @@ export default function AdminUserDetailPage() {
             {user.name || "Unnamed User"}
           </h1>
           <p className="text-hex-text-secondary text-sm">{user.email}</p>
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-2 mt-2 items-center">
             <Badge variant={user.isActive ? "success" : "error"}>
               {user.isActive ? "Active" : "Inactive"}
             </Badge>
             {user.role === "ADMIN" && <Badge variant="warning">Admin</Badge>}
+            {user.tier && user.tier !== "TIER_0" && (
+              <Badge variant="teal">{user.tier.replace("_", " ")}</Badge>
+            )}
+            <select
+              value={user.tier || "TIER_0"}
+              onChange={(e) => changeTier(e.target.value as Tier)}
+              className="px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-xs focus:outline-none focus:border-hex-teal"
+              title="Change user tier"
+            >
+              <option value="TIER_0">Tier 0</option>
+              <option value="TIER_1">Tier 1</option>
+              <option value="TIER_2">Tier 2</option>
+              <option value="TIER_3">Tier 3</option>
+            </select>
           </div>
         </div>
         <div className="flex gap-2">
@@ -132,18 +164,48 @@ export default function AdminUserDetailPage() {
       </div>
 
       {/* Agency Profile */}
-      {user.agencyProfile && (
-        <Card hoverable={false}>
-          <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-3">Agency Profile</h3>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            {user.agencyProfile.niche && <div><span className="text-hex-text-muted">Niche:</span> <span className="text-hex-text-primary">{user.agencyProfile.niche}</span></div>}
-            {user.agencyProfile.location && <div><span className="text-hex-text-muted">Location:</span> <span className="text-hex-text-primary">{user.agencyProfile.location}</span></div>}
-            {user.agencyProfile.monthlyRevenue && <div><span className="text-hex-text-muted">Revenue:</span> <span className="text-hex-text-primary">{user.agencyProfile.monthlyRevenue}</span></div>}
-            {user.agencyProfile.revenueGoal && <div><span className="text-hex-text-muted">Goal:</span> <span className="text-hex-text-primary">{user.agencyProfile.revenueGoal}</span></div>}
-            {user.agencyProfile.services?.length > 0 && <div className="col-span-2"><span className="text-hex-text-muted">Services:</span> <span className="text-hex-text-primary">{user.agencyProfile.services.join(", ")}</span></div>}
-          </div>
-        </Card>
-      )}
+      <Card hoverable={false}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-display text-sm font-semibold text-hex-text-primary">Agency Profile</h3>
+          {user.agencyProfile?.completedAt ? (
+            <Badge variant="success">Onboarded</Badge>
+          ) : (
+            <Badge variant="default">Not completed</Badge>
+          )}
+        </div>
+        {(() => {
+          const p = user.agencyProfile;
+          const hasAny = p && (
+            p.niche || p.location || p.monthlyRevenue || p.revenueGoal ||
+            p.experienceLevel || p.background || p.biggestChallenge ||
+            (p.services && p.services.length > 0)
+          );
+          if (!hasAny) {
+            return (
+              <p className="text-sm text-hex-text-muted">
+                This user hasn&apos;t filled out their agency profile yet.
+              </p>
+            );
+          }
+          const dash = <span className="text-hex-text-muted">—</span>;
+          return (
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div><span className="text-hex-text-muted">Niche:</span> <span className="text-hex-text-primary">{p!.niche || dash}</span></div>
+              <div><span className="text-hex-text-muted">Location:</span> <span className="text-hex-text-primary">{p!.location || dash}</span></div>
+              <div><span className="text-hex-text-muted">Revenue:</span> <span className="text-hex-text-primary">{p!.monthlyRevenue || dash}</span></div>
+              <div><span className="text-hex-text-muted">Goal:</span> <span className="text-hex-text-primary">{p!.revenueGoal || dash}</span></div>
+              <div><span className="text-hex-text-muted">Experience:</span> <span className="text-hex-text-primary">{p!.experienceLevel || dash}</span></div>
+              <div className="col-span-2"><span className="text-hex-text-muted">Services:</span> <span className="text-hex-text-primary">{p!.services?.length ? p!.services.join(", ") : dash}</span></div>
+              {p!.background && (
+                <div className="col-span-2"><span className="text-hex-text-muted">Background:</span> <span className="text-hex-text-primary">{p!.background}</span></div>
+              )}
+              {p!.biggestChallenge && (
+                <div className="col-span-2"><span className="text-hex-text-muted">Biggest challenge:</span> <span className="text-hex-text-primary">{p!.biggestChallenge}</span></div>
+              )}
+            </div>
+          );
+        })()}
+      </Card>
 
       {/* GPT Usage */}
       {user.gptUsage.length > 0 && (

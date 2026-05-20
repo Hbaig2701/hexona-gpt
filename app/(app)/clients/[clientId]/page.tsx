@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
+import BackLink from "@/components/ui/BackLink";
 import { getClientScopedGpts, GPT_CATEGORIES, type GPT } from "@/lib/gpt-catalog";
 
 interface ClientData {
@@ -92,6 +93,7 @@ export default function ClientDashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <BackLink href="/clients" label="Back to contacts" />
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>

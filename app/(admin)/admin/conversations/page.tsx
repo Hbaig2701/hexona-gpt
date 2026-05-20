@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import BackLink from "@/components/ui/BackLink";
 import MessageBubble from "@/components/chat/MessageBubble";
 import { X, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { GPT_CATALOG } from "@/lib/gpt-catalog";
@@ -70,6 +71,7 @@ function ConversationViewerContent() {
 
   return (
     <div className="max-w-6xl mx-auto">
+      <BackLink href="/admin" label="Back to admin" className="mb-4" />
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl font-bold text-hex-text-primary">Conversation Viewer</h1>
         <button

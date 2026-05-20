@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
+import BackLink from "@/components/ui/BackLink";
 import { RefreshCw } from "lucide-react";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -40,6 +41,7 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      <BackLink href="/admin" label="Back to admin" />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-2xl font-bold text-hex-text-primary">Analytics</h1>

@@ -6,12 +6,14 @@ import { Search, ToggleLeft, ToggleRight, RefreshCw } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
+import BackLink from "@/components/ui/BackLink";
 
 interface UserItem {
   id: string;
   name?: string;
   email: string;
   role: string;
+  tier: string;
   isActive: boolean;
   createdAt: string;
   lastActiveAt?: string;
@@ -22,8 +24,13 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [tierFilter, setTierFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const visibleUsers = tierFilter === "all"
+    ? users
+    : users.filter((u) => (u.tier || "TIER_0") === tierFilter);
 
   useEffect(() => {
     setLoading(true);
@@ -50,6 +57,7 @@ export default function AdminUsersPage() {
 
   return (
     <div className="max-w-5xl mx-auto">
+      <BackLink href="/admin" label="Back to admin" className="mb-4" />
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl font-bold text-hex-text-primary">
           User Management
@@ -82,6 +90,17 @@ export default function AdminUsersPage() {
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
+        <select
+          value={tierFilter}
+          onChange={(e) => setTierFilter(e.target.value)}
+          className="px-3 py-2 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-sm focus:outline-none focus:border-hex-teal"
+        >
+          <option value="all">All Tiers</option>
+          <option value="TIER_0">Tier 0</option>
+          <option value="TIER_1">Tier 1</option>
+          <option value="TIER_2">Tier 2</option>
+          <option value="TIER_3">Tier 3</option>
+        </select>
       </div>
 
       {loading ? (
@@ -92,7 +111,7 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {users.map((user) => (
+          {visibleUsers.map((user) => (
             <Card key={user.id} hoverable={false} className="flex items-center justify-between py-3">
               <Link href={`/admin/users/${user.id}`} className="flex-1 min-w-0">
                 <div className="flex items-center gap-3">
@@ -105,6 +124,9 @@ export default function AdminUsersPage() {
                         {user.name || "Unnamed"}
                       </p>
                       {user.role === "ADMIN" && <Badge variant="warning">Admin</Badge>}
+                      <Badge variant={user.tier && user.tier !== "TIER_0" ? "teal" : "default"}>
+                        {(user.tier || "TIER_0").replace("_", " ")}
+                      </Badge>
                     </div>
                     <p className="text-xs text-hex-text-muted truncate">{user.email}</p>
                   </div>

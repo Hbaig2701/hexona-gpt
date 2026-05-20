@@ -11,6 +11,7 @@ import HandoffChips from "./HandoffChips";
 import { getGptBySlug } from "@/lib/gpt-catalog";
 import { Eye, History, Plus } from "lucide-react";
 import Button from "@/components/ui/Button";
+import BackLink from "@/components/ui/BackLink";
 import GptGuideModal from "./GptGuideModal";
 
 interface MessageImage {
@@ -315,10 +316,15 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
     setVisibleCount(MESSAGES_PER_PAGE);
   }
 
+  const backHref = clientId ? `/clients/${clientId}` : "/dashboard";
+  const backLabel = clientId ? "Back to contact" : "Back to dashboard";
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-[var(--hex-dark-500)]">
+      <div className="pb-4 border-b border-[var(--hex-dark-500)]">
+        <BackLink href={backHref} label={backLabel} className="mb-2" />
+        <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-lg font-semibold text-[var(--hex-text-primary)]">
             {gpt?.name || gptSlug}
@@ -345,6 +351,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
           <Button variant="ghost" size="sm" onClick={() => setShowHistory(!showHistory)}>
             <History size={14} /> History
           </Button>
+        </div>
         </div>
       </div>
 

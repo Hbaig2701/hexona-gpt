@@ -151,10 +151,9 @@ export async function POST(req: NextRequest) {
   });
 
   // Load conversation history using sliding window + summary for older context.
-  // Keep the last 10 messages verbatim. If the conversation is longer, prepend
-  // the conversation summary so the model retains full context without blowing
-  // through token limits.
-  const RECENT_MESSAGE_COUNT = 10;
+  // Keep the last 50 messages verbatim (~25 exchanges) — easily fits in modern
+  // Claude/Perplexity context windows. Summary kicks in only for very long convos.
+  const RECENT_MESSAGE_COUNT = 50;
 
   const [recentMessages, totalMessageCount, conversation] = await Promise.all([
     prisma.message.findMany({
@@ -230,13 +229,18 @@ export async function POST(req: NextRequest) {
             );
           },
           async onDone(usage) {
+            const cacheCreation = usage.cacheCreationTokens ?? 0;
+            const cacheRead = usage.cacheReadTokens ?? 0;
+            // Total input incl. cache writes + reads, for visibility in the log.
+            const totalInputTokens = usage.inputTokens + cacheCreation + cacheRead;
+
             // Save assistant message
             await prisma.message.create({
               data: {
                 conversationId: convId,
                 role: "ASSISTANT",
                 content: fullResponse,
-                tokensUsed: usage.inputTokens + usage.outputTokens,
+                tokensUsed: totalInputTokens + usage.outputTokens,
               },
             });
 
@@ -247,9 +251,15 @@ export async function POST(req: NextRequest) {
                 gptSlug,
                 provider: routing.provider,
                 model: routing.model,
-                tokensInput: usage.inputTokens,
+                tokensInput: totalInputTokens,
                 tokensOutput: usage.outputTokens,
-                estimatedCost: estimateCost(routing.model, usage.inputTokens, usage.outputTokens),
+                estimatedCost: estimateCost(
+                  routing.model,
+                  usage.inputTokens,
+                  usage.outputTokens,
+                  cacheCreation,
+                  cacheRead
+                ),
               },
             });
 

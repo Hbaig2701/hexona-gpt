@@ -30,14 +30,31 @@ export function getRouting(gptSlug: string, modelOverride?: string | null) {
   return route;
 }
 
-export function estimateCost(model: string, inputTokens: number, outputTokens: number): number {
+export function estimateCost(
+  model: string,
+  inputTokens: number,
+  outputTokens: number,
+  cacheCreationTokens = 0,
+  cacheReadTokens = 0
+): number {
   const pricing = PRICING[model] || { input: 1.0, output: 1.0 };
-  return (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000;
+  // Anthropic prompt caching: writes cost 1.25x input, reads cost 0.1x input.
+  return (
+    inputTokens * pricing.input +
+    cacheCreationTokens * pricing.input * 1.25 +
+    cacheReadTokens * pricing.input * 0.1 +
+    outputTokens * pricing.output
+  ) / 1_000_000;
 }
 
 export interface StreamCallbacks {
   onToken: (token: string) => void;
-  onDone: (usage: { inputTokens: number; outputTokens: number }) => void;
+  onDone: (usage: {
+    inputTokens: number;
+    outputTokens: number;
+    cacheCreationTokens?: number;
+    cacheReadTokens?: number;
+  }) => void;
   onError: (error: Error) => void;
 }
 
@@ -59,11 +76,22 @@ export async function streamChat({
 }) {
   try {
     if (provider === "anthropic") {
+      // Prompt caching: mark the system prompt for ephemeral cache.
+      // System prompt is stable across a conversation, so every turn after
+      // the first within ~5 minutes hits the cache at 10% of input cost.
+      // If the prompt is below the model's minimum cacheable length
+      // (1024 for Sonnet, 2048 for Haiku), the marker is silently ignored.
       const stream = anthropic.messages.stream({
         model,
         max_tokens: 4096,
         temperature: temperature ?? 0.7,
-        system: systemPrompt,
+        system: [
+          {
+            type: "text",
+            text: systemPrompt,
+            cache_control: { type: "ephemeral" },
+          },
+        ],
         messages: messages.map((m) => ({
           role: m.role,
           content: m.content,
@@ -76,6 +104,8 @@ export async function streamChat({
       callbacks.onDone({
         inputTokens: finalMessage.usage.input_tokens,
         outputTokens: finalMessage.usage.output_tokens,
+        cacheCreationTokens: finalMessage.usage.cache_creation_input_tokens ?? 0,
+        cacheReadTokens: finalMessage.usage.cache_read_input_tokens ?? 0,
       });
     } else if (provider === "perplexity" || provider === "openai") {
       // For perplexity: try OpenRouter first, fall back to direct Perplexity API

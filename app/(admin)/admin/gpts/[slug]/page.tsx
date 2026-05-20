@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import BackLink from "@/components/ui/BackLink";
 import { Save, Upload, Trash2, Clock } from "lucide-react";
 import PromptEditorChat from "@/components/admin/PromptEditorChat";
 
@@ -119,6 +120,7 @@ export default function AdminGptConfigPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <BackLink href="/admin/gpts" label="Back to GPTs" className="mb-4" />
       <div className="flex items-center gap-3 mb-6">
         <h1 className="font-display text-2xl font-bold text-hex-text-primary">{slug}</h1>
         <Badge variant={config.isActive ? "success" : "error"}>

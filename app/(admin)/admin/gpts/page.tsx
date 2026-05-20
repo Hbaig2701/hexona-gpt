@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import BackLink from "@/components/ui/BackLink";
 import { GPT_CATEGORIES } from "@/lib/gpt-catalog";
 
 interface GptItem {
@@ -32,6 +33,7 @@ export default function AdminGptsPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <BackLink href="/admin" label="Back to admin" className="mb-4" />
       <h1 className="font-display text-2xl font-bold text-hex-text-primary mb-6">GPT Configuration</h1>
 
       <div className="space-y-2">

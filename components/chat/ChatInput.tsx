@@ -43,6 +43,14 @@ export default function ChatInput({ onSend, onStop, loading }: ChatInputProps) {
     }
   }, [loading]);
 
+  // Auto-resize textarea to fit content (capped by CSS max-height)
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [input]);
+
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

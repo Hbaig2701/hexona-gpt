@@ -44,6 +44,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          tier: user.tier,
           isActive: user.isActive,
         };
       },
@@ -90,6 +91,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as unknown as { role: string }).role;
+        token.tier = (user as unknown as { tier?: string }).tier ?? "TIER_0";
         token.isActive = (user as unknown as { isActive: boolean }).isActive;
       }
       return token;
@@ -98,6 +100,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as { id: string }).id = token.id as string;
         (session.user as { role: string }).role = token.role as string;
+        (session.user as { tier: string }).tier = (token.tier as string) ?? "TIER_0";
         (session.user as { isActive: boolean }).isActive = token.isActive as boolean;
       }
       return session;

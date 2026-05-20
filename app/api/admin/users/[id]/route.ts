@@ -58,6 +58,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   if (typeof body.isActive === "boolean") updateData.isActive = body.isActive;
   if (body.role === "ADMIN" || body.role === "USER") updateData.role = body.role;
+  if (
+    body.tier === "TIER_0" ||
+    body.tier === "TIER_1" ||
+    body.tier === "TIER_2" ||
+    body.tier === "TIER_3"
+  ) {
+    updateData.tier = body.tier;
+  }
 
   // Trigger password reset
   if (body.resetPassword) {
