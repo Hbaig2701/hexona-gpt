@@ -269,10 +269,17 @@ export async function POST(req: NextRequest) {
               data: { updatedAt: new Date() },
             });
 
-            // Auto-title generation (after first response)
+            // Auto-title generation: retries on every assistant response until a title
+            // exists. The DB update is race-safe (only writes if title is still null).
             const messageCount = await prisma.message.count({ where: { conversationId: convId } });
-            if (messageCount === 2) {
-              generateTitle(convId, message, fullResponse).catch(console.error);
+            const convForTitle = await prisma.conversation.findUnique({
+              where: { id: convId },
+              select: { title: true },
+            });
+            if (!convForTitle?.title && messageCount >= 2) {
+              generateTitle(convId, message, fullResponse).catch((err) =>
+                console.error("[generateTitle] failed:", err)
+              );
             }
 
             // Memory summarization: keep summary fresh so sliding window always
@@ -342,8 +349,10 @@ async function generateTitle(conversationId: string, userMessage: string, aiResp
 
     const title = (response.content[0] as { text: string }).text?.trim().replace(/^["']|["']$/g, "");
     if (title) {
-      await prisma.conversation.update({
-        where: { id: conversationId },
+      // updateMany so we only write if title is still null - avoids overwriting a
+      // title set by a concurrent retry or by an admin in the meantime.
+      await prisma.conversation.updateMany({
+        where: { id: conversationId, title: null },
         data: { title },
       });
     }

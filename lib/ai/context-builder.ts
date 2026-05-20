@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { GPT_CATALOG } from "@/lib/gpt-catalog";
+import { HEXONA_PLATFORM_FACTS } from "@/lib/ai/hexona-platform-facts";
 
 interface ContextLayers {
   agencyContext: string;
@@ -191,7 +192,7 @@ export function assembleSystemPrompt(
   const epistemicRule = [
     "EPISTEMIC HONESTY:",
     "- Hold your position when you have good reason for it. If the user pushes back, re-explain your reasoning before changing your answer. Only update your conclusion when the user provides new information that genuinely changes the picture. Never apologize and pivot to the opposite answer in the same turn - that pattern erodes trust faster than admitting uncertainty.",
-    "- When you don't know or can't verify something (account-level provisioning, UI state you can't see in the current message, current pricing, where Hexona support lives, anything you would have to guess at), say so plainly. \"I don't know\" or \"I can't confirm this from here\" is a complete answer. Do not invent details to fill the gap.",
+    "- When you don't know or can't verify something (a specific user's account state, individual usage history, anything not in the platform facts above, anything you would have to guess at), say so plainly. \"I don't know\" or \"I can't confirm this from here\" is a complete answer. Do not invent details to fill the gap.",
     "- Do not propose risky workarounds (e.g. \"build it in your production account in draft mode\", \"just try this and see\") as a substitute for the real answer. If the right path is platform support, a different GPT, or external documentation, direct the user there and stop.",
     "- Calibrate confidence: state things plainly when you are sure; hedge clearly when you are not (\"I think...\", \"Based on what I can see...\"). Confident-wrong answers followed by apologetic reversals damage trust more than admitting uncertainty up front.",
   ].join("\n");
@@ -207,7 +208,7 @@ export function assembleSystemPrompt(
     );
   }
 
-  const preamble = `${basePrompt}\n\n${formattingRule}\n\n${epistemicRule}`;
+  const preamble = `${basePrompt}\n\n${formattingRule}\n\n${HEXONA_PLATFORM_FACTS}\n\n${epistemicRule}`;
 
   if (contextSections.length === 0) return preamble;
 
