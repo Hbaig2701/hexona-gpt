@@ -129,7 +129,7 @@ export const GPT_CATALOG: GPT[] = [
     defaultModel: "claude-sonnet-4-6",
     provider: "anthropic",
     badge: "popular",
-    relatedGpts: ["prompt-engineer"],
+    relatedGpts: ["prompting"],
     guide: [
       "Describe your automation use case — it will tell you if it's buildable natively in GHL or needs Make/Zapier/n8n",
       "Gets specific: names exact triggers, actions, and configuration steps you need",
@@ -138,7 +138,7 @@ export const GPT_CATALOG: GPT[] = [
     ],
   },
   {
-    slug: "prompt-engineer",
+    slug: "prompting",
     name: "Prompting Advisor",
     description: "Write effective prompts for voice agents, DM agents, and AI workflow steps.",
     category: "fulfillment",
@@ -209,7 +209,7 @@ export const GPT_CATALOG: GPT[] = [
 
   // Onboarding
   {
-    slug: "agency-onboarding",
+    slug: "onboarding",
     name: "Onboarding Advisor",
     description: "Set up your agency profile through a friendly conversational interview.",
     category: "onboarding",
@@ -245,10 +245,10 @@ export const MODEL_ROUTING: Record<string, { provider: string; model: string }> 
   "proposal": { provider: "anthropic", model: "claude-sonnet-4-6" },
   "sales": { provider: "anthropic", model: "claude-sonnet-4-6" },
   "workflow": { provider: "anthropic", model: "claude-sonnet-4-6" },
-  "prompt-engineer": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
+  "prompting": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "contract": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "hamza-ai": { provider: "anthropic", model: "claude-sonnet-4-6" },
-  "agency-onboarding": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
+  "onboarding": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
 };
 
 export function getGptBySlug(slug: string): GPT | undefined {

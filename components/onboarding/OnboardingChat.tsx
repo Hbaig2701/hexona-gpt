@@ -43,7 +43,7 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
 
   // Resume existing onboarding conversation if one exists
   useEffect(() => {
-    fetch("/api/conversations?gptSlug=agency-onboarding&limit=1")
+    fetch("/api/conversations?gptSlug=onboarding&limit=1")
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0 && data[0]._count?.messages > 0) {
@@ -124,7 +124,7 @@ export default function OnboardingChat({ onComplete, onEarlyExit }: OnboardingCh
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          gptSlug: "agency-onboarding",
+          gptSlug: "onboarding",
           message: userMessage,
           conversationId, // Reuse conversation so the AI sees full history
         }),

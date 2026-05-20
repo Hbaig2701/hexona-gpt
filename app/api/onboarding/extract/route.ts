@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch the onboarding conversation messages
   const conversation = await prisma.conversation.findFirst({
-    where: { id: conversationId, userId: session.user.id, gptSlug: "agency-onboarding" },
+    where: { id: conversationId, userId: session.user.id, gptSlug: "onboarding" },
     include: { messages: { orderBy: { createdAt: "asc" } } },
   });
 
@@ -116,8 +116,8 @@ ${transcript}`,
   if (summary) {
     await Promise.all([
       prisma.gptMemory.upsert({
-        where: { userId_gptSlug: { userId: session.user.id, gptSlug: "agency-onboarding" } },
-        create: { userId: session.user.id, gptSlug: "agency-onboarding", memoryBlob: summary },
+        where: { userId_gptSlug: { userId: session.user.id, gptSlug: "onboarding" } },
+        create: { userId: session.user.id, gptSlug: "onboarding", memoryBlob: summary },
         update: { memoryBlob: summary },
       }),
       prisma.conversation.update({
