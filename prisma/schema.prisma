@@ -367,6 +367,7 @@ model Resource {
   url          String
   tableData    Json?
   listData     Json?
+  documentMd   String?
   category     String?
   thumbnailUrl String?
   requiredTier UserTier

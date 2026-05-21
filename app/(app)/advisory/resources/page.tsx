@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { ExternalLink, List as ListIcon, Table as TableIcon } from "lucide-react";
+import { ExternalLink, List as ListIcon, Table as TableIcon, FileText } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db/prisma";
 import { hasAdvisoryAccess } from "@/lib/advisory";
@@ -53,8 +53,15 @@ export default async function ResourcesPage() {
                   const hasUrl = r.url && r.url.length > 0;
                   const hasList = !!r.listData;
                   const hasTable = !!r.tableData;
-                  const inline = hasList || hasTable;
-                  const Icon = hasList ? ListIcon : hasTable ? TableIcon : ExternalLink;
+                  const hasDoc = !!r.documentMd && r.documentMd.trim().length > 0;
+                  const inline = hasList || hasTable || hasDoc;
+                  const Icon = hasDoc
+                    ? FileText
+                    : hasList
+                    ? ListIcon
+                    : hasTable
+                    ? TableIcon
+                    : ExternalLink;
 
                   const inner = (
                     <Card className="flex items-start gap-3 h-full">

@@ -8,6 +8,7 @@ import { hasAdvisoryAccess, tierMatches } from "@/lib/advisory";
 import type { UserTier } from "@prisma/client";
 import LessonTable from "@/components/advisory/LessonTable";
 import ResourceList from "@/components/advisory/ResourceList";
+import ResourceDocument from "@/components/advisory/ResourceDocument";
 
 export const dynamic = "force-dynamic";
 
@@ -59,8 +60,9 @@ export default async function ResourceDetailPage({
 
   const tableData = parseTableData(resource.tableData);
   const listData = parseListData(resource.listData);
+  const documentMd = resource.documentMd && resource.documentMd.trim() ? resource.documentMd : null;
 
-  if (!tableData && !listData && resource.url) {
+  if (!tableData && !listData && !documentMd && resource.url) {
     redirect(resource.url);
   }
 
@@ -90,13 +92,14 @@ export default async function ResourceDetailPage({
         )}
       </div>
 
+      {documentMd && <ResourceDocument markdown={documentMd} />}
       {listData && <ResourceList data={listData} />}
       {tableData && <LessonTable data={tableData} />}
-      {!listData && !tableData && (
+      {!documentMd && !listData && !tableData && (
         <p className="text-[var(--hex-text-muted)] text-sm">No content available.</p>
       )}
 
-      {(listData || tableData) && resource.url && (
+      {(documentMd || listData || tableData) && resource.url && (
         <div className="mt-4">
           <a
             href={resource.url}

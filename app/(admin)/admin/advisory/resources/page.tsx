@@ -28,6 +28,7 @@ type Resource = {
   url: string;
   tableData: TableData | null;
   listData: ListData | null;
+  documentMd: string | null;
   category: string | null;
   thumbnailUrl: string | null;
   requiredTier: UserTier;
@@ -175,12 +176,15 @@ function ResourceForm({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const initialMode: "link" | "list" | "table" = resource?.listData
+  const initialMode: "link" | "list" | "table" | "document" = resource?.documentMd
+    ? "document"
+    : resource?.listData
     ? "list"
     : resource?.tableData
     ? "table"
     : "link";
-  const [mode, setMode] = useState<"link" | "list" | "table">(initialMode);
+  const [mode, setMode] = useState<"link" | "list" | "table" | "document">(initialMode);
+  const [documentMd, setDocumentMd] = useState<string>(resource?.documentMd ?? "");
   const [form, setForm] = useState({
     title: resource?.title ?? "",
     slug: resource?.slug ?? "",
@@ -208,6 +212,7 @@ function ResourceForm({
       ...form,
       listData: mode === "list" && listItems.length > 0 ? { items: listItems } : null,
       tableData: mode === "table" ? tableData : null,
+      documentMd: mode === "document" && documentMd.trim() ? documentMd : null,
     };
     const res = await fetch(url, {
       method: resource ? "PATCH" : "POST",
@@ -255,6 +260,7 @@ function ResourceForm({
                 { k: "link", label: "External link" },
                 { k: "list", label: "List" },
                 { k: "table", label: "Table" },
+                { k: "document", label: "Document" },
               ] as const).map((opt) => (
                 <button
                   key={opt.k}
@@ -274,6 +280,7 @@ function ResourceForm({
               {mode === "link" && "Opens an external URL in a new tab."}
               {mode === "list" && "Click-to-expand items with links — good for funnel templates, libraries."}
               {mode === "table" && "Sortable, searchable table — good for data with multiple columns."}
+              {mode === "document" && "Long-form written guide (markdown). Renders inline with headings, lists, blockquotes."}
             </p>
           </div>
 
@@ -289,6 +296,23 @@ function ResourceForm({
           )}
           {mode === "table" && (
             <TableEditor value={tableData} onChange={setTableData} />
+          )}
+          {mode === "document" && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-hex-text-secondary">
+                Markdown content
+              </label>
+              <textarea
+                value={documentMd}
+                onChange={(e) => setDocumentMd(e.target.value)}
+                rows={16}
+                placeholder={`# Title\n\nIntro paragraph.\n\n## Section\n- bullet\n- bullet`}
+                className="w-full px-3 py-2 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-xs font-mono focus:outline-none focus:border-hex-teal resize-y"
+              />
+              <p className="text-xs text-hex-text-muted">
+                Supports headings (#, ##, ###), lists, **bold**, *italic*, &gt; blockquotes, links, tables, --- horizontal rules.
+              </p>
+            </div>
           )}
 
           <Input
