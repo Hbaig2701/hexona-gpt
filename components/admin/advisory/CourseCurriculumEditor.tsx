@@ -18,6 +18,8 @@ import {
   Table as TableIcon,
   AlertTriangle,
   X,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import type { LessonType } from "@prisma/client";
 import Card from "@/components/ui/Card";
@@ -534,6 +536,10 @@ function LessonRowItem({
   onEdit: () => void;
 }) {
   const Icon = LESSON_TYPE_ICON[lesson.type];
+  const [togglingPublish, setTogglingPublish] = useState(false);
+  // Optimistic state: reflect the click immediately, parent onChange() will catch up.
+  const [optimisticPublished, setOptimisticPublished] = useState<boolean | null>(null);
+  const isPublished = optimisticPublished ?? lesson.isPublished;
 
   async function move(direction: "up" | "down") {
     const idx = siblingIds.indexOf(lesson.id);
@@ -550,6 +556,24 @@ function LessonRowItem({
     onChange();
   }
 
+  async function togglePublished() {
+    if (togglingPublish) return;
+    const next = !isPublished;
+    setTogglingPublish(true);
+    setOptimisticPublished(next);
+    const result = await mutate(`/api/admin/advisory/lessons/${lesson.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isPublished: next }),
+    });
+    setTogglingPublish(false);
+    if (!result.ok) {
+      setOptimisticPublished(!next);
+      return onError(`${next ? "Publish" : "Unpublish"} failed: ${result.error}`);
+    }
+    onChange();
+  }
+
   async function deleteLesson() {
     if (!confirm(`Delete lesson "${lesson.title}"?`)) return;
     const result = await mutate(`/api/admin/advisory/lessons/${lesson.id}`, { method: "DELETE" });
@@ -558,15 +582,44 @@ function LessonRowItem({
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-hex-dark-700/30 border border-hex-dark-500/40 rounded text-sm">
+    <div
+      className={`flex items-center gap-2 px-3 py-2 border rounded text-sm ${
+        isPublished
+          ? "bg-hex-dark-700/30 border-hex-dark-500/40"
+          : "bg-hex-warning/5 border-hex-warning/30"
+      }`}
+    >
       <Icon size={14} className="text-hex-text-muted shrink-0" />
       <div className="flex-1 min-w-0">
-        <p className="text-hex-text-primary truncate">{lesson.title}</p>
-        <p className="text-xs text-hex-text-muted truncate font-mono">
-          {lesson.type}
-          {lesson.isPublished ? "" : " · draft"}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-hex-text-primary truncate">{lesson.title}</p>
+          {!isPublished && (
+            <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-hex-warning/20 text-hex-warning border border-hex-warning/30">
+              Draft
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-hex-text-muted truncate font-mono">{lesson.type}</p>
       </div>
+      <button
+        type="button"
+        onClick={togglePublished}
+        disabled={togglingPublish}
+        className={`p-1 disabled:opacity-50 ${
+          isPublished
+            ? "text-hex-success/80 hover:text-hex-success"
+            : "text-hex-warning/80 hover:text-hex-warning"
+        }`}
+        title={isPublished ? "Published — click to unpublish" : "Draft — click to publish"}
+      >
+        {togglingPublish ? (
+          <Loader2 size={12} className="animate-spin" />
+        ) : isPublished ? (
+          <Eye size={12} />
+        ) : (
+          <EyeOff size={12} />
+        )}
+      </button>
       <button
         type="button"
         onClick={() => move("up")}
