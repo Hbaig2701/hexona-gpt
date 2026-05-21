@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Plus,
   Trash2,
@@ -60,12 +60,14 @@ interface Props {
 export default function CourseCurriculumEditor({ course, onChange }: Props) {
   const [newModuleTitle, setNewModuleTitle] = useState("");
   const [creatingModule, setCreatingModule] = useState(false);
+  const [showNewModule, setShowNewModule] = useState(false);
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [creatingLessonInModule, setCreatingLessonInModule] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(
     new Set(course.modules.map((m) => m.id))
   );
   const [error, setError] = useState<string | null>(null);
+  const moduleInputRef = useRef<HTMLInputElement>(null);
 
   function toggle(id: string) {
     setExpanded((prev) => {
@@ -76,10 +78,13 @@ export default function CourseCurriculumEditor({ course, onChange }: Props) {
     });
   }
 
-  async function addTopLevelModule(e: React.FormEvent) {
-    e.preventDefault();
+  async function createTopLevelModule() {
+    if (creatingModule) return;
     const title = newModuleTitle.trim();
-    if (!title || creatingModule) return;
+    if (!title) {
+      moduleInputRef.current?.focus();
+      return;
+    }
     setCreatingModule(true);
     setError(null);
     const result = await mutate(`/api/admin/advisory/courses/${course.id}/modules`, {
@@ -101,24 +106,49 @@ export default function CourseCurriculumEditor({ course, onChange }: Props) {
       });
     }
     setNewModuleTitle("");
+    setShowNewModule(false);
     onChange();
+  }
+
+  function cancelNewModule() {
+    setShowNewModule(false);
+    setNewModuleTitle("");
   }
 
   return (
     <div className="space-y-4">
       {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
 
-      <form onSubmit={addTopLevelModule} className="flex gap-2">
-        <input
-          value={newModuleTitle}
-          onChange={(e) => setNewModuleTitle(e.target.value)}
-          placeholder="New module title (e.g. Introduction)"
-          className="flex-1 px-3 py-2 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-sm placeholder:text-hex-text-muted focus:outline-none focus:border-hex-teal"
-        />
-        <Button type="submit" loading={creatingModule}>
+      {showNewModule ? (
+        <div className="flex gap-2 p-2 bg-hex-dark-700/50 border border-hex-teal/30 rounded">
+          <input
+            ref={moduleInputRef}
+            value={newModuleTitle}
+            onChange={(e) => setNewModuleTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                createTopLevelModule();
+              } else if (e.key === "Escape") {
+                cancelNewModule();
+              }
+            }}
+            autoFocus
+            placeholder="Module title (e.g. Introduction)"
+            className="flex-1 px-3 py-2 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-sm placeholder:text-hex-text-muted focus:outline-none focus:border-hex-teal"
+          />
+          <Button type="button" onClick={createTopLevelModule} loading={creatingModule}>
+            <Plus size={14} /> Create
+          </Button>
+          <Button type="button" variant="ghost" onClick={cancelNewModule}>
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button type="button" onClick={() => setShowNewModule(true)}>
           <Plus size={14} /> Add Module
         </Button>
-      </form>
+      )}
 
       {course.modules.length === 0 ? (
         <Card hoverable={false} className="text-center py-10">
@@ -210,6 +240,8 @@ function ModuleCard({
   const [saving, setSaving] = useState(false);
   const [newSubTitle, setNewSubTitle] = useState("");
   const [addingSub, setAddingSub] = useState(false);
+  const [showNewSub, setShowNewSub] = useState(false);
+  const subInputRef = useRef<HTMLInputElement>(null);
 
   const lessons = module.lessons ?? [];
   const children = module.children ?? [];
@@ -255,10 +287,13 @@ function ModuleCard({
     onChange();
   }
 
-  async function addSubModule(e: React.FormEvent) {
-    e.preventDefault();
+  async function createSubModule() {
+    if (addingSub) return;
     const title = newSubTitle.trim();
-    if (!title || addingSub) return;
+    if (!title) {
+      subInputRef.current?.focus();
+      return;
+    }
     setAddingSub(true);
     const result = await mutate(`/api/admin/advisory/courses/${courseId}/modules`, {
       method: "POST",
@@ -268,7 +303,13 @@ function ModuleCard({
     setAddingSub(false);
     if (!result.ok) return onError(`Add sub-module failed: ${result.error}`);
     setNewSubTitle("");
+    setShowNewSub(false);
     onChange();
+  }
+
+  function cancelSubModule() {
+    setShowNewSub(false);
+    setNewSubTitle("");
   }
 
   return (
@@ -431,22 +472,43 @@ function ModuleCard({
 
           {/* Add sub-module (only at top level) */}
           {!isSub && (
-            <form onSubmit={addSubModule} className="flex gap-2 pt-2 border-t border-hex-dark-500/40">
-              <input
-                value={newSubTitle}
-                onChange={(e) => setNewSubTitle(e.target.value)}
-                placeholder="Add sub-module (e.g. LinkedIn)"
-                className="flex-1 px-3 py-1.5 bg-hex-dark-700 border border-hex-dark-500 rounded text-sm text-hex-text-primary placeholder:text-hex-text-muted focus:outline-none focus:border-hex-teal"
-              />
-              <Button
-                size="sm"
-                type="submit"
-                variant="secondary"
-                loading={addingSub}
-              >
-                <FolderPlus size={12} /> Add Sub-module
-              </Button>
-            </form>
+            <div className="pt-2 border-t border-hex-dark-500/40">
+              {showNewSub ? (
+                <div className="flex gap-2 items-stretch p-2 bg-hex-dark-700/50 border border-hex-teal/30 rounded">
+                  <input
+                    ref={subInputRef}
+                    value={newSubTitle}
+                    onChange={(e) => setNewSubTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        createSubModule();
+                      } else if (e.key === "Escape") {
+                        cancelSubModule();
+                      }
+                    }}
+                    autoFocus
+                    placeholder="Sub-module title (e.g. LinkedIn)"
+                    className="flex-1 px-3 py-1.5 bg-hex-dark-600 border border-hex-dark-500 rounded text-sm text-hex-text-primary placeholder:text-hex-text-muted focus:outline-none focus:border-hex-teal"
+                  />
+                  <Button size="sm" type="button" onClick={createSubModule} loading={addingSub}>
+                    <Plus size={12} /> Create
+                  </Button>
+                  <Button size="sm" type="button" variant="ghost" onClick={cancelSubModule}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="sm"
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowNewSub(true)}
+                >
+                  <FolderPlus size={12} /> Add Sub-module
+                </Button>
+              )}
+            </div>
           )}
         </div>
       )}
