@@ -15,6 +15,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if ("description" in body) data.description = body.description || null;
   if ("url" in body) data.url = body.url || "";
   if ("category" in body) data.category = body.category || null;
+  if ("tableData" in body) data.tableData = body.tableData ?? null;
+  if ("listData" in body) data.listData = body.listData ?? null;
   if ("thumbnailUrl" in body) data.thumbnailUrl = body.thumbnailUrl || null;
   if ("requiredTier" in body) data.requiredTier = body.requiredTier;
   if ("isPublished" in body) data.isPublished = !!body.isPublished;

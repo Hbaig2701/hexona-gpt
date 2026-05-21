@@ -1,15 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Edit3, Loader2, ExternalLink, Save, X } from "lucide-react";
+import { Plus, Trash2, Edit3, Loader2, ExternalLink, Save, X, GripVertical } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Badge from "@/components/ui/Badge";
 import BackLink from "@/components/ui/BackLink";
 import type { UserTier } from "@prisma/client";
+import { csvToTableData } from "@/lib/csv";
 
 const TIER_OPTIONS: UserTier[] = ["TIER_1", "TIER_2", "TIER_3"];
+
+type TableData = { headers: string[]; rows: string[][] };
+type ListItem = {
+  title: string;
+  description?: string;
+  links: Array<{ label: string; url: string }>;
+};
+type ListData = { items: ListItem[] };
 
 type Resource = {
   id: string;
@@ -17,6 +26,8 @@ type Resource = {
   title: string;
   description: string | null;
   url: string;
+  tableData: TableData | null;
+  listData: ListData | null;
   category: string | null;
   thumbnailUrl: string | null;
   requiredTier: UserTier;
@@ -164,6 +175,12 @@ function ResourceForm({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const initialMode: "link" | "list" | "table" = resource?.listData
+    ? "list"
+    : resource?.tableData
+    ? "table"
+    : "link";
+  const [mode, setMode] = useState<"link" | "list" | "table">(initialMode);
   const [form, setForm] = useState({
     title: resource?.title ?? "",
     slug: resource?.slug ?? "",
@@ -174,6 +191,8 @@ function ResourceForm({
     thumbnailUrl: resource?.thumbnailUrl ?? "",
     isPublished: resource?.isPublished ?? true,
   });
+  const [listItems, setListItems] = useState<ListItem[]>(resource?.listData?.items ?? []);
+  const [tableData, setTableData] = useState<TableData | null>(resource?.tableData ?? null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -185,10 +204,15 @@ function ResourceForm({
     const url = resource
       ? `/api/admin/advisory/resources/${resource.id}`
       : "/api/admin/advisory/resources";
+    const body = {
+      ...form,
+      listData: mode === "list" && listItems.length > 0 ? { items: listItems } : null,
+      tableData: mode === "table" ? tableData : null,
+    };
     const res = await fetch(url, {
       method: resource ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(body),
     });
     setSaving(false);
     if (!res.ok) {
@@ -224,12 +248,49 @@ function ResourceForm({
               className="w-full px-3 py-2 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-sm focus:outline-none focus:border-hex-teal resize-y"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-hex-text-secondary mb-1.5">Content type</label>
+            <div className="flex gap-1 p-1 bg-hex-dark-700 rounded-lg border border-hex-dark-500">
+              {([
+                { k: "link", label: "External link" },
+                { k: "list", label: "List" },
+                { k: "table", label: "Table" },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.k}
+                  type="button"
+                  onClick={() => setMode(opt.k)}
+                  className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    mode === opt.k
+                      ? "bg-hex-dark-900 text-hex-teal"
+                      : "text-hex-text-muted hover:text-hex-text-secondary"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-hex-text-muted mt-1.5">
+              {mode === "link" && "Opens an external URL in a new tab."}
+              {mode === "list" && "Click-to-expand items with links — good for funnel templates, libraries."}
+              {mode === "table" && "Sortable, searchable table — good for data with multiple columns."}
+            </p>
+          </div>
+
           <Input
-            label="Link URL"
+            label={mode === "link" ? "Link URL" : "Original sheet URL (optional)"}
             value={form.url}
             onChange={(e) => setForm({ ...form, url: e.target.value })}
             placeholder="https://docs.google.com/…"
           />
+
+          {mode === "list" && (
+            <ListEditor items={listItems} onChange={setListItems} />
+          )}
+          {mode === "table" && (
+            <TableEditor value={tableData} onChange={setTableData} />
+          )}
+
           <Input
             label="Category (optional)"
             value={form.category}
@@ -278,6 +339,158 @@ function ResourceForm({
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+function ListEditor({
+  items,
+  onChange,
+}: {
+  items: ListItem[];
+  onChange: (next: ListItem[]) => void;
+}) {
+  function update(idx: number, patch: Partial<ListItem>) {
+    onChange(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
+  function addItem() {
+    onChange([...items, { title: "", description: "", links: [{ label: "Open", url: "" }] }]);
+  }
+  function removeItem(idx: number) {
+    onChange(items.filter((_, i) => i !== idx));
+  }
+  function move(idx: number, dir: -1 | 1) {
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    const next = [...items];
+    [next[idx], next[target]] = [next[target], next[idx]];
+    onChange(next);
+  }
+  function updateLink(itemIdx: number, linkIdx: number, patch: { label?: string; url?: string }) {
+    const item = items[itemIdx];
+    const newLinks = item.links.map((l, i) => (i === linkIdx ? { ...l, ...patch } : l));
+    update(itemIdx, { links: newLinks });
+  }
+  function addLink(itemIdx: number) {
+    update(itemIdx, { links: [...items[itemIdx].links, { label: "Open", url: "" }] });
+  }
+  function removeLink(itemIdx: number, linkIdx: number) {
+    update(itemIdx, { links: items[itemIdx].links.filter((_, i) => i !== linkIdx) });
+  }
+
+  return (
+    <div className="space-y-2 bg-hex-dark-700/40 border border-hex-dark-500 rounded p-3">
+      <p className="text-xs text-hex-text-muted">
+        Each item shows as a collapsible row. Click to expand → reveals description + links.
+      </p>
+      {items.map((item, idx) => (
+        <div key={idx} className="bg-hex-dark-800 border border-hex-dark-500 rounded p-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <GripVertical size={12} className="text-hex-text-muted shrink-0" />
+            <input
+              value={item.title}
+              onChange={(e) => update(idx, { title: e.target.value })}
+              placeholder="Item title (e.g. Lead Magnet Funnel)"
+              className="flex-1 px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-sm text-hex-text-primary focus:outline-none focus:border-hex-teal"
+            />
+            <button type="button" onClick={() => move(idx, -1)} disabled={idx === 0} className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30">↑</button>
+            <button type="button" onClick={() => move(idx, 1)} disabled={idx === items.length - 1} className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30">↓</button>
+            <button type="button" onClick={() => removeItem(idx)} className="p-1 text-red-400/70 hover:text-red-400">
+              <Trash2 size={12} />
+            </button>
+          </div>
+          <textarea
+            value={item.description ?? ""}
+            onChange={(e) => update(idx, { description: e.target.value })}
+            rows={2}
+            placeholder="Description (optional)"
+            className="w-full px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-xs text-hex-text-secondary focus:outline-none focus:border-hex-teal resize-y"
+          />
+          <div className="space-y-1.5 pl-3 border-l-2 border-hex-dark-500">
+            {item.links.map((link, li) => (
+              <div key={li} className="flex items-center gap-1.5">
+                <input
+                  value={link.label}
+                  onChange={(e) => updateLink(idx, li, { label: e.target.value })}
+                  placeholder="Label"
+                  className="w-24 px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-xs text-hex-text-primary focus:outline-none focus:border-hex-teal"
+                />
+                <input
+                  value={link.url}
+                  onChange={(e) => updateLink(idx, li, { url: e.target.value })}
+                  placeholder="https://…"
+                  className="flex-1 px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-xs font-mono text-hex-text-primary focus:outline-none focus:border-hex-teal"
+                />
+                <button type="button" onClick={() => removeLink(idx, li)} className="p-1 text-red-400/70 hover:text-red-400">
+                  <Trash2 size={11} />
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={() => addLink(idx)} className="text-xs text-hex-teal hover:underline">
+              + Add link
+            </button>
+          </div>
+        </div>
+      ))}
+      <Button type="button" size="sm" variant="secondary" onClick={addItem}>
+        <Plus size={12} /> Add Item
+      </Button>
+    </div>
+  );
+}
+
+function TableEditor({
+  value,
+  onChange,
+}: {
+  value: TableData | null;
+  onChange: (v: TableData | null) => void;
+}) {
+  const [pasteText, setPasteText] = useState("");
+  const [pasteError, setPasteError] = useState<string | null>(null);
+
+  function applyPaste() {
+    setPasteError(null);
+    const parsed = csvToTableData(pasteText);
+    if (!parsed || parsed.headers.length === 0) {
+      setPasteError("Could not parse — paste comma- or tab-separated rows including a header row.");
+      return;
+    }
+    onChange(parsed);
+    setPasteText("");
+  }
+
+  return (
+    <div className="space-y-3 bg-hex-dark-700/40 border border-hex-dark-500 rounded p-3">
+      <p className="text-xs text-hex-text-muted">
+        Paste tabular data (CSV or copied from Google Sheets/Excel). First row is the header.
+      </p>
+      <textarea
+        value={pasteText}
+        onChange={(e) => setPasteText(e.target.value)}
+        rows={6}
+        placeholder={`Header A,Header B\nrow1col1,row1col2\nrow2col1,row2col2`}
+        className="w-full px-3 py-2 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-xs font-mono focus:outline-none focus:border-hex-teal resize-y"
+      />
+      <div className="flex items-center gap-2 flex-wrap">
+        <Button type="button" size="sm" onClick={applyPaste}>Parse & Replace</Button>
+        {value && (
+          <Button type="button" size="sm" variant="ghost" onClick={() => onChange(null)}>
+            Clear table
+          </Button>
+        )}
+        {pasteError && <span className="text-xs text-hex-error">{pasteError}</span>}
+      </div>
+      {value && (
+        <div className="text-xs text-hex-text-secondary border-t border-hex-dark-500 pt-2">
+          <p className="font-semibold mb-1">
+            {value.rows.length} row{value.rows.length !== 1 ? "s" : ""} × {value.headers.length} column{value.headers.length !== 1 ? "s" : ""}
+          </p>
+          <p className="text-hex-text-muted truncate font-mono">
+            {value.headers.join(", ")}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

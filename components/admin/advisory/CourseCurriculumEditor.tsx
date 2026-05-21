@@ -16,11 +16,12 @@ import {
   ExternalLink,
   Sparkles,
   Table as TableIcon,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import type { LessonType } from "@prisma/client";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 import LessonEditorModal from "./LessonEditorModal";
 import type { CourseFull, ModuleNode, LessonRow } from "./types";
 
@@ -31,6 +32,25 @@ const LESSON_TYPE_ICON: Record<LessonType, typeof PlayCircle> = {
   TOOL_LINK: Sparkles,
   TABLE: TableIcon,
 };
+
+/**
+ * Centralised mutation helper — surfaces server errors instead of swallowing them.
+ */
+async function mutate(
+  url: string,
+  init: RequestInit
+): Promise<{ ok: true; data: unknown } | { ok: false; error: string }> {
+  try {
+    const res = await fetch(url, init);
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { ok: false, error: body?.error || `Request failed (${res.status})` };
+    }
+    return { ok: true, data: body };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Network error" };
+  }
+}
 
 interface Props {
   course: CourseFull;
@@ -45,6 +65,7 @@ export default function CourseCurriculumEditor({ course, onChange }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(
     new Set(course.modules.map((m) => m.id))
   );
+  const [error, setError] = useState<string | null>(null);
 
   function toggle(id: string) {
     setExpanded((prev) => {
@@ -57,25 +78,42 @@ export default function CourseCurriculumEditor({ course, onChange }: Props) {
 
   async function addTopLevelModule(e: React.FormEvent) {
     e.preventDefault();
-    if (!newModuleTitle.trim() || creatingModule) return;
+    const title = newModuleTitle.trim();
+    if (!title || creatingModule) return;
     setCreatingModule(true);
-    await fetch(`/api/admin/advisory/courses/${course.id}/modules`, {
+    setError(null);
+    const result = await mutate(`/api/admin/advisory/courses/${course.id}/modules`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newModuleTitle.trim() }),
+      body: JSON.stringify({ title }),
     });
     setCreatingModule(false);
+    if (!result.ok) {
+      setError(`Add module failed: ${result.error}`);
+      return;
+    }
+    const created = result.data as { id?: string };
+    if (created.id) {
+      setExpanded((prev) => {
+        const next = new Set(prev);
+        next.add(created.id!);
+        return next;
+      });
+    }
     setNewModuleTitle("");
     onChange();
   }
 
   return (
     <div className="space-y-4">
+      {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
+
       <form onSubmit={addTopLevelModule} className="flex gap-2">
-        <Input
+        <input
           value={newModuleTitle}
           onChange={(e) => setNewModuleTitle(e.target.value)}
           placeholder="New module title (e.g. Introduction)"
+          className="flex-1 px-3 py-2 bg-hex-dark-600 border border-hex-dark-500 rounded text-hex-text-primary text-sm placeholder:text-hex-text-muted focus:outline-none focus:border-hex-teal"
         />
         <Button type="submit" loading={creatingModule}>
           <Plus size={14} /> Add Module
@@ -101,6 +139,7 @@ export default function CourseCurriculumEditor({ course, onChange }: Props) {
               siblingIds={course.modules.map((x) => x.id)}
               courseId={course.id}
               onChange={onChange}
+              onError={setError}
               onEditLesson={setEditingLessonId}
               onCreateLessonInModule={setCreatingLessonInModule}
               creatingLessonInModule={creatingLessonInModule}
@@ -123,6 +162,18 @@ export default function CourseCurriculumEditor({ course, onChange }: Props) {
   );
 }
 
+function ErrorBanner({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-lg bg-hex-error/10 border border-hex-error/30 text-sm">
+      <AlertTriangle size={16} className="text-hex-error shrink-0 mt-0.5" />
+      <p className="flex-1 text-hex-error">{message}</p>
+      <button onClick={onDismiss} className="text-hex-error/70 hover:text-hex-error">
+        <X size={14} />
+      </button>
+    </div>
+  );
+}
+
 interface ModuleCardProps {
   module: ModuleNode;
   expanded: boolean;
@@ -132,6 +183,7 @@ interface ModuleCardProps {
   siblingIds: string[];
   courseId: string;
   onChange: () => void;
+  onError: (message: string) => void;
   onEditLesson: (id: string) => void;
   onCreateLessonInModule: (id: string | null) => void;
   creatingLessonInModule: string | null;
@@ -147,6 +199,7 @@ function ModuleCard({
   siblingIds,
   courseId,
   onChange,
+  onError,
   onEditLesson,
   onCreateLessonInModule,
   creatingLessonInModule,
@@ -167,43 +220,53 @@ function ModuleCard({
     if (target < 0 || target >= siblingIds.length) return;
     const reordered = [...siblingIds];
     [reordered[idx], reordered[target]] = [reordered[target], reordered[idx]];
-    await fetch(`/api/admin/advisory/reorder`, {
+    const result = await mutate(`/api/admin/advisory/reorder`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ kind: "modules", ids: reordered }),
     });
+    if (!result.ok) return onError(`Reorder failed: ${result.error}`);
     onChange();
   }
 
   async function saveModule() {
     setSaving(true);
-    await fetch(`/api/admin/advisory/modules/${module.id}`, {
+    const result = await mutate(`/api/admin/advisory/modules/${module.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: form.title, color: form.color || null }),
+      body: JSON.stringify({ title: form.title.trim(), color: form.color.trim() || null }),
     });
     setSaving(false);
+    if (!result.ok) return onError(`Save module failed: ${result.error}`);
     setEditing(false);
     onChange();
   }
 
   async function deleteModule() {
     const totalLessons = lessons.length + children.reduce((s, c) => s + (c.lessons?.length ?? 0), 0);
-    if (!confirm(`Delete "${module.title}"? This will also remove ${totalLessons} lesson(s) and any sub-modules.`)) return;
-    await fetch(`/api/admin/advisory/modules/${module.id}`, { method: "DELETE" });
+    if (
+      !confirm(
+        `Delete "${module.title}"? This will also remove ${totalLessons} lesson(s) and any sub-modules.`
+      )
+    )
+      return;
+    const result = await mutate(`/api/admin/advisory/modules/${module.id}`, { method: "DELETE" });
+    if (!result.ok) return onError(`Delete failed: ${result.error}`);
     onChange();
   }
 
   async function addSubModule(e: React.FormEvent) {
     e.preventDefault();
-    if (!newSubTitle.trim() || addingSub) return;
+    const title = newSubTitle.trim();
+    if (!title || addingSub) return;
     setAddingSub(true);
-    await fetch(`/api/admin/advisory/courses/${courseId}/modules`, {
+    const result = await mutate(`/api/admin/advisory/courses/${courseId}/modules`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newSubTitle.trim(), parentId: module.id }),
+      body: JSON.stringify({ title, parentId: module.id }),
     });
     setAddingSub(false);
+    if (!result.ok) return onError(`Add sub-module failed: ${result.error}`);
     setNewSubTitle("");
     onChange();
   }
@@ -211,12 +274,20 @@ function ModuleCard({
   return (
     <Card
       hoverable={false}
-      className={`!p-0 overflow-hidden ${isSub ? "border-l-4" : ""}`}
-      style={module.color ? { borderLeftColor: module.color, borderLeftWidth: 3, borderLeftStyle: "solid" } : undefined}
+      className="!p-0 overflow-hidden"
+      style={
+        module.color
+          ? { borderLeftColor: module.color, borderLeftWidth: 3, borderLeftStyle: "solid" }
+          : undefined
+      }
     >
       {/* Header */}
       <div className="px-4 py-3 flex items-center gap-2 border-b border-hex-dark-500 bg-hex-dark-700/40">
-        <button onClick={onToggle} className="text-hex-text-muted hover:text-hex-text-primary">
+        <button
+          type="button"
+          onClick={onToggle}
+          className="text-hex-text-muted hover:text-hex-text-primary"
+        >
           {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
 
@@ -225,16 +296,28 @@ function ModuleCard({
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="flex-1 px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-sm text-hex-text-primary"
+              className="flex-1 px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-sm text-hex-text-primary focus:outline-none focus:border-hex-teal"
             />
             <input
               value={form.color}
               onChange={(e) => setForm({ ...form, color: e.target.value })}
               placeholder="#A855F7"
-              className="w-24 px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-xs font-mono text-hex-text-primary"
+              className="w-24 px-2 py-1 bg-hex-dark-600 border border-hex-dark-500 rounded text-xs font-mono text-hex-text-primary focus:outline-none focus:border-hex-teal"
             />
-            <Button size="sm" onClick={saveModule} loading={saving}>Save</Button>
-            <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setForm({ title: module.title, color: module.color ?? "" }); }}>Cancel</Button>
+            <Button size="sm" type="button" onClick={saveModule} loading={saving}>
+              Save
+            </Button>
+            <Button
+              size="sm"
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setEditing(false);
+                setForm({ title: module.title, color: module.color ?? "" });
+              }}
+            >
+              Cancel
+            </Button>
           </>
         ) : (
           <>
@@ -246,6 +329,7 @@ function ModuleCard({
               {children.length > 0 && `, ${children.length} sub`}
             </span>
             <button
+              type="button"
               onClick={() => move("up")}
               disabled={!canMoveUp}
               className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30"
@@ -254,6 +338,7 @@ function ModuleCard({
               <ArrowUp size={14} />
             </button>
             <button
+              type="button"
               onClick={() => move("down")}
               disabled={!canMoveDown}
               className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30"
@@ -262,6 +347,7 @@ function ModuleCard({
               <ArrowDown size={14} />
             </button>
             <button
+              type="button"
               onClick={() => setEditing(true)}
               className="p-1 text-hex-text-muted hover:text-hex-text-primary"
               title="Rename / set color"
@@ -269,6 +355,7 @@ function ModuleCard({
               <Edit3 size={14} />
             </button>
             <button
+              type="button"
               onClick={deleteModule}
               className="p-1 text-red-400/70 hover:text-red-400"
               title="Delete module"
@@ -292,6 +379,7 @@ function ModuleCard({
                   canMoveDown={idx < lessons.length - 1}
                   siblingIds={lessons.map((l) => l.id)}
                   onChange={onChange}
+                  onError={onError}
                   onEdit={() => onEditLesson(lesson.id)}
                 />
               ))}
@@ -303,35 +391,43 @@ function ModuleCard({
             <NewLessonInline
               moduleId={module.id}
               onClose={() => onCreateLessonInModule(null)}
+              onError={onError}
               onSaved={() => {
                 onCreateLessonInModule(null);
                 onChange();
               }}
             />
           ) : (
-            <Button size="sm" variant="ghost" onClick={() => onCreateLessonInModule(module.id)}>
+            <Button
+              size="sm"
+              type="button"
+              variant="ghost"
+              onClick={() => onCreateLessonInModule(module.id)}
+            >
               <Plus size={12} /> Add Lesson
             </Button>
           )}
 
           {/* Sub-modules (only allowed at top level) */}
-          {!isSub && children.map((sub, idx) => (
-            <ModuleCard
-              key={sub.id}
-              module={sub}
-              expanded={true}
-              onToggle={() => {}}
-              canMoveUp={idx > 0}
-              canMoveDown={idx < children.length - 1}
-              siblingIds={children.map((c) => c.id)}
-              courseId={courseId}
-              onChange={onChange}
-              onEditLesson={onEditLesson}
-              onCreateLessonInModule={onCreateLessonInModule}
-              creatingLessonInModule={creatingLessonInModule}
-              isSub
-            />
-          ))}
+          {!isSub &&
+            children.map((sub, idx) => (
+              <ModuleCard
+                key={sub.id}
+                module={sub}
+                expanded={true}
+                onToggle={() => {}}
+                canMoveUp={idx > 0}
+                canMoveDown={idx < children.length - 1}
+                siblingIds={children.map((c) => c.id)}
+                courseId={courseId}
+                onChange={onChange}
+                onError={onError}
+                onEditLesson={onEditLesson}
+                onCreateLessonInModule={onCreateLessonInModule}
+                creatingLessonInModule={creatingLessonInModule}
+                isSub
+              />
+            ))}
 
           {/* Add sub-module (only at top level) */}
           {!isSub && (
@@ -342,7 +438,12 @@ function ModuleCard({
                 placeholder="Add sub-module (e.g. LinkedIn)"
                 className="flex-1 px-3 py-1.5 bg-hex-dark-700 border border-hex-dark-500 rounded text-sm text-hex-text-primary placeholder:text-hex-text-muted focus:outline-none focus:border-hex-teal"
               />
-              <Button size="sm" type="submit" variant="secondary" loading={addingSub}>
+              <Button
+                size="sm"
+                type="submit"
+                variant="secondary"
+                loading={addingSub}
+              >
                 <FolderPlus size={12} /> Add Sub-module
               </Button>
             </form>
@@ -359,6 +460,7 @@ function LessonRowItem({
   canMoveDown,
   siblingIds,
   onChange,
+  onError,
   onEdit,
 }: {
   lesson: LessonRow;
@@ -366,6 +468,7 @@ function LessonRowItem({
   canMoveDown: boolean;
   siblingIds: string[];
   onChange: () => void;
+  onError: (message: string) => void;
   onEdit: () => void;
 }) {
   const Icon = LESSON_TYPE_ICON[lesson.type];
@@ -376,17 +479,19 @@ function LessonRowItem({
     if (target < 0 || target >= siblingIds.length) return;
     const reordered = [...siblingIds];
     [reordered[idx], reordered[target]] = [reordered[target], reordered[idx]];
-    await fetch(`/api/admin/advisory/reorder`, {
+    const result = await mutate(`/api/admin/advisory/reorder`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ kind: "lessons", ids: reordered }),
     });
+    if (!result.ok) return onError(`Reorder lesson failed: ${result.error}`);
     onChange();
   }
 
   async function deleteLesson() {
     if (!confirm(`Delete lesson "${lesson.title}"?`)) return;
-    await fetch(`/api/admin/advisory/lessons/${lesson.id}`, { method: "DELETE" });
+    const result = await mutate(`/api/admin/advisory/lessons/${lesson.id}`, { method: "DELETE" });
+    if (!result.ok) return onError(`Delete lesson failed: ${result.error}`);
     onChange();
   }
 
@@ -396,19 +501,40 @@ function LessonRowItem({
       <div className="flex-1 min-w-0">
         <p className="text-hex-text-primary truncate">{lesson.title}</p>
         <p className="text-xs text-hex-text-muted truncate font-mono">
-          {lesson.type}{lesson.isPublished ? "" : " · draft"}
+          {lesson.type}
+          {lesson.isPublished ? "" : " · draft"}
         </p>
       </div>
-      <button onClick={() => move("up")} disabled={!canMoveUp} className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30">
+      <button
+        type="button"
+        onClick={() => move("up")}
+        disabled={!canMoveUp}
+        className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30"
+      >
         <ArrowUp size={12} />
       </button>
-      <button onClick={() => move("down")} disabled={!canMoveDown} className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30">
+      <button
+        type="button"
+        onClick={() => move("down")}
+        disabled={!canMoveDown}
+        className="p-1 text-hex-text-muted hover:text-hex-text-primary disabled:opacity-30"
+      >
         <ArrowDown size={12} />
       </button>
-      <button onClick={onEdit} className="p-1 text-hex-text-muted hover:text-hex-teal" title="Edit lesson">
+      <button
+        type="button"
+        onClick={onEdit}
+        className="p-1 text-hex-text-muted hover:text-hex-teal"
+        title="Edit lesson"
+      >
         <Edit3 size={12} />
       </button>
-      <button onClick={deleteLesson} className="p-1 text-red-400/70 hover:text-red-400" title="Delete">
+      <button
+        type="button"
+        onClick={deleteLesson}
+        className="p-1 text-red-400/70 hover:text-red-400"
+        title="Delete"
+      >
         <Trash2 size={12} />
       </button>
     </div>
@@ -418,10 +544,12 @@ function LessonRowItem({
 function NewLessonInline({
   moduleId,
   onClose,
+  onError,
   onSaved,
 }: {
   moduleId: string;
   onClose: () => void;
+  onError: (message: string) => void;
   onSaved: () => void;
 }) {
   const [title, setTitle] = useState("");
@@ -432,17 +560,21 @@ function NewLessonInline({
     e.preventDefault();
     if (!title.trim() || creating) return;
     setCreating(true);
-    await fetch(`/api/admin/advisory/modules/${moduleId}/lessons`, {
+    const result = await mutate(`/api/admin/advisory/modules/${moduleId}/lessons`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: title.trim(), type }),
     });
     setCreating(false);
+    if (!result.ok) return onError(`Add lesson failed: ${result.error}`);
     onSaved();
   }
 
   return (
-    <form onSubmit={create} className="flex gap-2 items-stretch p-2 bg-hex-dark-700/50 border border-hex-teal/30 rounded">
+    <form
+      onSubmit={create}
+      className="flex gap-2 items-stretch p-2 bg-hex-dark-700/50 border border-hex-teal/30 rounded"
+    >
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -465,7 +597,9 @@ function NewLessonInline({
         {creating ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
         Create
       </Button>
-      <Button size="sm" type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button size="sm" type="button" variant="ghost" onClick={onClose}>
+        Cancel
+      </Button>
     </form>
   );
 }

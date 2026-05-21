@@ -43,6 +43,8 @@ export async function POST(req: Request) {
       title,
       description: body.description || null,
       url: typeof body.url === "string" ? body.url : "",
+      tableData: body.tableData ?? null,
+      listData: body.listData ?? null,
       category: body.category || null,
       thumbnailUrl: body.thumbnailUrl || null,
       requiredTier: body.requiredTier ?? "TIER_1",
