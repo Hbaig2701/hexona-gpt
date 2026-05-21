@@ -1,4 +1,4 @@
-export type GPTCategory = "research" | "sales" | "fulfillment" | "strategy" | "onboarding";
+export type GPTCategory = "research" | "sales" | "fulfillment" | "strategy";
 
 export type GPT = {
   slug: string;
@@ -207,12 +207,12 @@ export const GPT_CATALOG: GPT[] = [
     ],
   },
 
-  // Onboarding
+  // Onboarding (lives in Fulfillment & Delivery for sidebar grouping)
   {
     slug: "onboarding",
     name: "Onboarding Advisor",
     description: "Set up your agency profile through a friendly conversational interview.",
-    category: "onboarding",
+    category: "fulfillment",
     scope: "global",
     icon: "Rocket",
     suggestedPrompts: [
@@ -236,7 +236,6 @@ export const GPT_CATEGORIES: Record<GPTCategory, { label: string; icon: string; 
   sales: { label: "Sales & Revenue", icon: "TrendingUp", color: "#00C4CC" },
   fulfillment: { label: "Fulfillment & Delivery", icon: "Settings", color: "#10B981" },
   strategy: { label: "Strategy & Growth", icon: "Brain", color: "#F59E0B" },
-  onboarding: { label: "Onboarding", icon: "Rocket", color: "#EF4444" },
 };
 
 export const MODEL_ROUTING: Record<string, { provider: string; model: string }> = {
