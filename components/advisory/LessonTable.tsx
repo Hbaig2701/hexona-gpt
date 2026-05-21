@@ -86,7 +86,7 @@ export default function LessonTable({ data }: Props) {
 
   const filteredSorted = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let rows = q
+    const rows = q
       ? data.rows.filter((row) => row.some((cell) => cell.toLowerCase().includes(q)))
       : [...data.rows];
 
