@@ -30,6 +30,7 @@ export async function GET() {
           orderBy: { order: "asc" },
           include: {
             lessons: {
+              where: { isPublished: true },
               orderBy: { order: "asc" },
               select: { id: true, slug: true, title: true, type: true },
             },
@@ -37,6 +38,7 @@ export async function GET() {
               orderBy: { order: "asc" },
               include: {
                 lessons: {
+                  where: { isPublished: true },
                   orderBy: { order: "asc" },
                   select: { id: true, slug: true, title: true, type: true },
                 },
