@@ -16,7 +16,9 @@ import {
   ChevronRight,
   Trash2,
 } from "lucide-react";
-import { GPT_CATEGORIES, getGptsByCategory, type GPTCategory } from "@/lib/gpt-catalog";
+import { useSession } from "next-auth/react";
+import { GPT_CATEGORIES, getGptsByCategory, userCanAccessGpt, type GPTCategory } from "@/lib/gpt-catalog";
+import type { UserTier } from "@prisma/client";
 
 interface ClientItem {
   id: string;
@@ -34,6 +36,8 @@ const categoryIcons: Record<string, React.ElementType> = {
 export default function AdvisorsSidebarContent() {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session } = useSession();
+  const userTier = (session?.user as { tier?: UserTier } | undefined)?.tier ?? "TIER_0";
   const [clients, setClients] = useState<ClientItem[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [clientsExpanded, setClientsExpanded] = useState(true);
@@ -157,6 +161,10 @@ export default function AdvisorsSidebarContent() {
         </p>
         {(Object.entries(GPT_CATEGORIES) as [GPTCategory, typeof GPT_CATEGORIES[GPTCategory]][]).map(
           ([key, cat]) => {
+            const visibleGpts = getGptsByCategory(key as GPTCategory).filter((g) =>
+              userCanAccessGpt(userTier, g)
+            );
+            if (visibleGpts.length === 0) return null;
             const IconComponent = categoryIcons[cat.icon] || Search;
             return (
               <div key={key}>
@@ -184,7 +192,7 @@ export default function AdvisorsSidebarContent() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      {getGptsByCategory(key as GPTCategory).map((gpt) => (
+                      {visibleGpts.map((gpt) => (
                         <Link
                           key={gpt.slug}
                           href={`/advisors/${gpt.slug}`}

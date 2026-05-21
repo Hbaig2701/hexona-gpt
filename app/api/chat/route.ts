@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/prisma";
 import { buildContextLayers, assembleSystemPrompt } from "@/lib/ai/context-builder";
 import { getRouting, streamChat, estimateCost } from "@/lib/ai/router";
 import { getDefaultSystemPrompt } from "@/lib/ai/system-prompts";
+import { getGptBySlug, userCanAccessGpt } from "@/lib/gpt-catalog";
 
 export const dynamic = "force-dynamic";
 // Rate limit: 50 messages per hour per user
@@ -30,8 +31,11 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  // Check active status
-  const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { isActive: true } });
+  // Check active status + tier
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isActive: true, tier: true },
+  });
   if (!user?.isActive) {
     return new Response(JSON.stringify({ error: "Account inactive" }), { status: 403 });
   }
@@ -57,6 +61,12 @@ export async function POST(req: NextRequest) {
   const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
   if (!gptSlug || (!hasMessage && !hasAttachments)) {
     return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
+  }
+
+  // Tier-gated Advisors: reject if user's tier is below the Advisor's minTier
+  const gptDef = getGptBySlug(gptSlug);
+  if (gptDef && !userCanAccessGpt(user.tier, gptDef)) {
+    return new Response(JSON.stringify({ error: "This Advisor is not available on your plan" }), { status: 403 });
   }
 
   // Get GPT config from DB, fall back to defaults

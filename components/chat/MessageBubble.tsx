@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Download } from "lucide-react";
 import { markdownComponents, linkifyInternalPaths } from "@/lib/markdown-components";
 
 interface MessageImage {
@@ -17,11 +17,49 @@ interface MessageBubbleProps {
   content: string;
   images?: MessageImage[];
   streaming?: boolean;
+  gptSlug?: string;
 }
 
-export default function MessageBubble({ role, content, images, streaming }: MessageBubbleProps) {
+const SPEC_MARKER = "<!--PROJECT_SPEC_MD-->";
+
+function inferSpecFilename(specMd: string): string {
+  const match = specMd.match(/^#\s+(.+?)\s*[—–-]\s*Technical Specification/m);
+  if (match) {
+    const slug = match[1]
+      .replace(/[[\]]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 50);
+    if (slug) return `${slug}-spec.md`;
+  }
+  return "project-spec.md";
+}
+
+export default function MessageBubble({ role, content, images, streaming, gptSlug }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
   const markdownRef = useRef<HTMLDivElement>(null);
+
+  const isSpecMessage =
+    role === "assistant" && gptSlug === "project-spec" && content.trimStart().startsWith(SPEC_MARKER);
+  const specMd = isSpecMessage
+    ? content.replace(/^\s*<!--PROJECT_SPEC_MD-->\s*\n?/, "")
+    : content;
+
+  function handleDownloadSpec() {
+    const blob = new Blob([specMd], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = inferSpecFilename(specMd);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setDownloaded(true);
+    setTimeout(() => setDownloaded(false), 2000);
+  }
 
   function handleCopy() {
     // Copy as rich text (HTML) so it pastes nicely into Google Docs, Gmail, etc.
@@ -53,7 +91,7 @@ export default function MessageBubble({ role, content, images, streaming }: Mess
   // wrap bare /advisors/<slug>-style internal paths so they render as real links.
   const cleanContent = isUser
     ? content
-    : linkifyInternalPaths(content.replace(/\[\d+\]/g, ""));
+    : linkifyInternalPaths(specMd.replace(/\[\d+\]/g, ""));
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} group`}>
@@ -91,14 +129,35 @@ export default function MessageBubble({ role, content, images, streaming }: Mess
           </div>
         )}
 
-        {/* Copy button */}
+        {/* Action buttons */}
         {!streaming && !isUser && (
-          <button
-            onClick={handleCopy}
-            className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg bg-hex-dark-600 border border-hex-dark-500 text-hex-text-muted hover:text-hex-text-primary"
-          >
-            {copied ? <Check size={12} className="text-hex-success" /> : <Copy size={12} />}
-          </button>
+          <div className="absolute -top-2 -right-2 flex gap-1.5 items-center">
+            {isSpecMessage && (
+              <button
+                onClick={handleDownloadSpec}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-hex-teal text-hex-dark-900 text-xs font-semibold shadow-sm hover:brightness-110 transition"
+              >
+                {downloaded ? (
+                  <>
+                    <Check size={12} /> Saved
+                  </>
+                ) : (
+                  <>
+                    <Download size={12} /> Download .md
+                  </>
+                )}
+              </button>
+            )}
+            <button
+              onClick={handleCopy}
+              title="Copy"
+              className={`p-1.5 rounded-lg bg-hex-dark-600 border border-hex-dark-500 text-hex-text-muted hover:text-hex-text-primary transition-opacity ${
+                isSpecMessage ? "" : "opacity-0 group-hover:opacity-100"
+              }`}
+            >
+              {copied ? <Check size={12} className="text-hex-success" /> : <Copy size={12} />}
+            </button>
+          </div>
         )}
       </div>
     </div>

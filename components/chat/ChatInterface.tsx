@@ -381,7 +381,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
 
         {visibleMessages.map((msg, index) => (
           <div key={msg.id}>
-            <MessageBubble role={msg.role} content={msg.content} images={msg.images} />
+            <MessageBubble role={msg.role} content={msg.content} images={msg.images} gptSlug={gptSlug} />
             {msg.role === "assistant" &&
               hiddenCount + index === messages.length - 1 &&
               !loading && (
@@ -391,7 +391,7 @@ export default function ChatInterface({ gptSlug, clientId, clientName }: ChatInt
         ))}
 
         {streamingContent && (
-          <MessageBubble role="assistant" content={streamingContent} streaming />
+          <MessageBubble role="assistant" content={streamingContent} streaming gptSlug={gptSlug} />
         )}
 
         <div ref={messagesEndRef} />

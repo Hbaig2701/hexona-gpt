@@ -1,3 +1,5 @@
+import type { UserTier } from "@prisma/client";
+
 export type GPTCategory = "research" | "sales" | "fulfillment" | "strategy";
 
 export type GPT = {
@@ -13,7 +15,21 @@ export type GPT = {
   badge?: "popular" | "new" | "pro";
   relatedGpts?: string[];
   guide?: string[];
+  minTier?: UserTier;
 };
+
+const TIER_ORDER: Record<UserTier, number> = {
+  TIER_0: 0,
+  TIER_1: 1,
+  TIER_2: 2,
+  TIER_3: 3,
+};
+
+export function userCanAccessGpt(userTier: UserTier | undefined, gpt: GPT): boolean {
+  if (!gpt.minTier) return true;
+  const tier = userTier ?? "TIER_0";
+  return TIER_ORDER[tier] >= TIER_ORDER[gpt.minTier];
+}
 
 export const GPT_CATALOG: GPT[] = [
   // Research & Discovery
@@ -207,6 +223,32 @@ export const GPT_CATALOG: GPT[] = [
     ],
   },
 
+  {
+    slug: "project-spec",
+    name: "Project Spec Advisor",
+    description: "Turn a project idea into a clean, Claude-Code-ready spec — scope, tech stack, screens, and build order.",
+    category: "strategy",
+    scope: "global",
+    icon: "FileCode",
+    suggestedPrompts: [
+      "I want to build an internal tool for my agency — help me scope it",
+      "I have a project idea for a client portal — let's spec it out",
+      "I want to build a custom CRM dashboard, can we map it out?",
+      "Help me turn this rough idea into a Claude Code build doc",
+    ],
+    defaultModel: "claude-sonnet-4-6",
+    provider: "anthropic",
+    badge: "new",
+    minTier: "TIER_1",
+    relatedGpts: ["hamza-ai", "workflow"],
+    guide: [
+      "Treat it like a technical co-founder — describe the project in plain English, it pushes back where the scope is wrong",
+      "Walks you through 6 phases: orient, strategic review, features, design, tech stack, then writes the spec",
+      "Output is a full markdown spec you can paste straight into Claude Code or convert to PDF",
+      "Best for custom software builds — internal agency tools, client portals, dashboards, niche SaaS",
+    ],
+  },
+
   // Onboarding (lives in Fulfillment & Delivery for sidebar grouping)
   {
     slug: "onboarding",
@@ -247,6 +289,7 @@ export const MODEL_ROUTING: Record<string, { provider: string; model: string }> 
   "prompting": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "contract": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
   "hamza-ai": { provider: "anthropic", model: "claude-sonnet-4-6" },
+  "project-spec": { provider: "anthropic", model: "claude-sonnet-4-6" },
   "onboarding": { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
 };
 

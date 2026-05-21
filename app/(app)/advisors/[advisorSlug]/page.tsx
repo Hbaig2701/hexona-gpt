@@ -2,17 +2,25 @@
 
 import { useParams } from "next/navigation";
 import { Suspense } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import * as LucideIcons from "lucide-react";
 import ChatInterface from "@/components/chat/ChatInterface";
 import ContactPickerInterstitial from "@/components/advisors/ContactPickerInterstitial";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { GPT_CATEGORIES, getGptBySlug, getGptsByCategory, type GPTCategory } from "@/lib/gpt-catalog";
+import {
+  GPT_CATEGORIES,
+  getGptBySlug,
+  getGptsByCategory,
+  userCanAccessGpt,
+  type GPTCategory,
+} from "@/lib/gpt-catalog";
+import type { UserTier } from "@prisma/client";
 
-function CategoryView({ category }: { category: GPTCategory }) {
+function CategoryView({ category, userTier }: { category: GPTCategory; userTier: UserTier }) {
   const categoryInfo = GPT_CATEGORIES[category];
-  const gpts = getGptsByCategory(category);
+  const gpts = getGptsByCategory(category).filter((g) => userCanAccessGpt(userTier, g));
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -62,16 +70,19 @@ function CategoryView({ category }: { category: GPTCategory }) {
 export default function GptPage() {
   const params = useParams();
   const slug = params.advisorSlug as string;
+  const { data: session } = useSession();
+  const userTier = (session?.user as { tier?: UserTier } | undefined)?.tier ?? "TIER_0";
 
   // Check if it's a valid GPT first (takes priority over category if slug matches both)
   const gpt = getGptBySlug(slug);
 
   // If not a GPT, check if this is a category
   if (!gpt && slug in GPT_CATEGORIES) {
-    return <CategoryView category={slug as GPTCategory} />;
+    return <CategoryView category={slug as GPTCategory} userTier={userTier} />;
   }
 
-  if (!gpt) {
+  // Tier-gated advisors look like "not found" to users below the required tier
+  if (!gpt || !userCanAccessGpt(userTier, gpt)) {
     return <p className="text-hex-text-muted text-center py-12">Advisor not found</p>;
   }
 
