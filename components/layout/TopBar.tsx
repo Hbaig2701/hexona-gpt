@@ -5,6 +5,13 @@ import { signOut, useSession } from "next-auth/react";
 import { LogOut, Menu } from "lucide-react";
 import { useSidebarStore } from "@/lib/stores/sidebar-store";
 
+function titleCase(slug: string): string {
+  return slug
+    .split("-")
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
+
 function getBreadcrumb(pathname: string): string {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) return "Dashboard";
@@ -14,15 +21,20 @@ function getBreadcrumb(pathname: string): string {
     clients: "Contacts",
     gpts: "Advisors",
     advisors: "Advisors",
+    advisory: "Advisory",
+    resources: "Resources",
+    todos: "To-Dos",
     settings: "Settings",
     admin: "Admin",
     new: "New",
     users: "Users",
     analytics: "Analytics",
     conversations: "Conversations",
+    courses: "Courses",
+    instructors: "Instructors",
   };
 
-  return segments.map((s) => labels[s] || s).join(" / ");
+  return segments.map((s) => labels[s] ?? titleCase(s)).join(" / ");
 }
 
 export default function TopBar() {

@@ -1,7 +1,9 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { GPT_CATALOG } from "../lib/gpt-catalog";
+import { seedAdvisory } from "./seed-advisory";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -37,6 +39,8 @@ async function main() {
     });
     console.log(`  ✓ ${gpt.slug}`);
   }
+
+  await seedAdvisory(prisma);
 
   console.log("Seed complete.");
 }

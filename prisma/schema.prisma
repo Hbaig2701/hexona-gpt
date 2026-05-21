@@ -20,12 +20,16 @@ model User {
   updatedAt      DateTime  @updatedAt
   lastActiveAt   DateTime?
 
-  agencyProfile  AgencyProfile?
-  clients        Client[]
-  conversations  Conversation[]
-  gptMemory      GptMemory[]
-  passwordResets PasswordReset[]
-  usageLogs      UsageLog[]
+  agencyProfile     AgencyProfile?
+  clients           Client[]
+  conversations     Conversation[]
+  gptMemory         GptMemory[]
+  passwordResets    PasswordReset[]
+  usageLogs         UsageLog[]
+  enrollments       Enrollment[]
+  lessonCompletions LessonCompletion[]
+  quizSubmissions   QuizSubmission[]
+  advisoryTodos     AdvisoryTodo[]
 }
 
 enum UserRole {
@@ -214,4 +218,172 @@ model UsageLog {
   tokensOutput  Int
   estimatedCost Float
   createdAt     DateTime @default(now())
+}
+
+// ============================================================
+// Advisory (courses + resources)
+// ============================================================
+
+model Course {
+  id            String       @id @default(cuid())
+  slug          String       @unique
+  title         String
+  subtitle      String?
+  heroBannerUrl String?
+  thumbnailUrl  String?
+  ctaLabel      String       @default("Start Course")
+  requiredTier  UserTier
+  instructorId  String?
+  instructor    Instructor?  @relation(fields: [instructorId], references: [id])
+  isPublished   Boolean      @default(false)
+  order         Int          @default(0)
+  modules       Module[]
+  enrollments   Enrollment[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Instructor {
+  id       String   @id @default(cuid())
+  name     String
+  bio      String?
+  photoUrl String?
+  courses  Course[]
+}
+
+model Module {
+  id       String   @id @default(cuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  parentId String?
+  parent   Module?  @relation("ModuleNesting", fields: [parentId], references: [id], onDelete: Cascade)
+  children Module[] @relation("ModuleNesting")
+  title    String
+  color    String?
+  order    Int      @default(0)
+  lessons  Lesson[]
+}
+
+enum LessonType {
+  VIDEO
+  CHECKPOINT
+  RESOURCE
+  TOOL_LINK
+  TABLE
+}
+
+model Lesson {
+  id           String             @id @default(cuid())
+  moduleId     String
+  module       Module             @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  slug         String
+  title        String
+  description  String?
+  type         LessonType
+  loomUrl      String?
+  durationSec  Int?
+  externalUrl  String?
+  advisorSlug  String?
+  tableData    Json?
+  thumbnailUrl String?
+  cardBg       String?
+  order        Int                @default(0)
+  isPublished  Boolean            @default(true)
+  quiz         Quiz?
+  completions  LessonCompletion[]
+
+  @@unique([moduleId, slug])
+}
+
+model Quiz {
+  id           String           @id @default(cuid())
+  lessonId     String           @unique
+  lesson       Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  passingScore Int              @default(100)
+  questions    Question[]
+  submissions  QuizSubmission[]
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  SHORT_ANSWER
+  FILE_UPLOAD
+  URL_SUBMISSION
+}
+
+model Question {
+  id            String       @id @default(cuid())
+  quizId        String
+  quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  type          QuestionType
+  prompt        String
+  options       Json?
+  correctAnswer String?
+  order         Int          @default(0)
+}
+
+model QuizSubmission {
+  id          String   @id @default(cuid())
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  answers     Json
+  score       Int
+  passed      Boolean
+  submittedAt DateTime @default(now())
+
+  @@index([quizId, userId])
+}
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  @@unique([userId, courseId])
+}
+
+model LessonCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+}
+
+model Resource {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  description  String?
+  url          String
+  category     String?
+  thumbnailUrl String?
+  requiredTier UserTier
+  order        Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AdvisoryTodo {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String
+  isCompleted Boolean   @default(false)
+  order       Int       @default(0)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, order])
 }

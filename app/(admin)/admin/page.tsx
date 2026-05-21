@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
-import { Users, Brain, BarChart3, MessageSquare, RefreshCw } from "lucide-react";
+import { Users, Brain, BarChart3, MessageSquare, RefreshCw, GraduationCap } from "lucide-react";
 
 interface AdminStats {
   totalUsers: number;
@@ -40,6 +40,14 @@ export default function AdminDashboardPage() {
       icon: Brain,
       href: "/admin/advisors",
       color: "#F59E0B",
+    },
+    {
+      title: "Advisory",
+      value: "→",
+      subtitle: "Courses, resources, instructors",
+      icon: GraduationCap,
+      href: "/admin/advisory",
+      color: "#A855F7",
     },
     {
       title: "Messages",
@@ -102,6 +110,12 @@ export default function AdminDashboardPage() {
           <Card className="cursor-pointer">
             <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-1">Advisor Configuration</h3>
             <p className="text-hex-text-muted text-sm">Edit system prompts, knowledge base, settings</p>
+          </Card>
+        </Link>
+        <Link href="/admin/advisory">
+          <Card className="cursor-pointer">
+            <h3 className="font-display text-sm font-semibold text-hex-text-primary mb-1">Advisory (Courses)</h3>
+            <p className="text-hex-text-muted text-sm">Manage courses, modules, lessons, resources, instructors</p>
           </Card>
         </Link>
         <Link href="/admin/analytics">

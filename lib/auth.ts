@@ -98,10 +98,24 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { id: string }).id = token.id as string;
-        (session.user as { role: string }).role = token.role as string;
-        (session.user as { tier: string }).tier = (token.tier as string) ?? "TIER_0";
-        (session.user as { isActive: boolean }).isActive = token.isActive as boolean;
+        const userId = token.id as string;
+        (session.user as { id: string }).id = userId;
+
+        // Refresh role/tier/isActive from DB on each session refresh so tier
+        // upgrades (and admin promotions) take effect without forcing re-login.
+        const fresh = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { role: true, tier: true, isActive: true },
+        });
+        if (fresh) {
+          (session.user as { role: string }).role = fresh.role;
+          (session.user as { tier: string }).tier = fresh.tier;
+          (session.user as { isActive: boolean }).isActive = fresh.isActive;
+        } else {
+          (session.user as { role: string }).role = token.role as string;
+          (session.user as { tier: string }).tier = (token.tier as string) ?? "TIER_0";
+          (session.user as { isActive: boolean }).isActive = token.isActive as boolean;
+        }
       }
       return session;
     },
