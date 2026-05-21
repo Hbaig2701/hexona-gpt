@@ -5,7 +5,7 @@ import { X, Sparkles } from "lucide-react";
 
 // Bump this ID when posting a new announcement so the banner re-shows
 // for users who previously dismissed an older one.
-const ANNOUNCEMENT_ID = "2026-05-updates-coming";
+const ANNOUNCEMENT_ID = "2026-05-rebrand-agency-advisory";
 const STORAGE_KEY = `hexona-announcement-dismissed:${ANNOUNCEMENT_ID}`;
 
 export default function AnnouncementBanner() {
@@ -32,7 +32,7 @@ export default function AnnouncementBanner() {
       <div className="flex items-center justify-center gap-2 text-sm text-[var(--hex-text-primary)]">
         <Sparkles size={14} className="text-hex-teal flex-shrink-0" />
         <span className="font-medium">
-          New Updates Coming to Agency Advisory and All Advisors This Week
+          HexonaGPT is now Agency Advisory — new features dropping all week
         </span>
       </div>
       <button
