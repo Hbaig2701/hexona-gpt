@@ -34,11 +34,17 @@ export async function POST(_req: Request, { params }: { params: { lessonId: stri
   const auth = await authorize(params.lessonId);
   if ("error" in auth) return auth.error;
 
-  await prisma.lessonCompletion.upsert({
-    where: { userId_lessonId: { userId: auth.userId, lessonId: auth.lessonId } },
-    create: { userId: auth.userId, lessonId: auth.lessonId },
-    update: {},
-  });
+  await Promise.all([
+    prisma.lessonCompletion.upsert({
+      where: { userId_lessonId: { userId: auth.userId, lessonId: auth.lessonId } },
+      create: { userId: auth.userId, lessonId: auth.lessonId },
+      update: {},
+    }),
+    prisma.user.update({
+      where: { id: auth.userId },
+      data: { lastActiveAt: new Date() },
+    }),
+  ]);
   return NextResponse.json({ completed: true });
 }
 
@@ -46,10 +52,16 @@ export async function DELETE(_req: Request, { params }: { params: { lessonId: st
   const auth = await authorize(params.lessonId);
   if ("error" in auth) return auth.error;
 
-  await prisma.lessonCompletion
-    .delete({
-      where: { userId_lessonId: { userId: auth.userId, lessonId: auth.lessonId } },
-    })
-    .catch(() => null);
+  await Promise.all([
+    prisma.lessonCompletion
+      .delete({
+        where: { userId_lessonId: { userId: auth.userId, lessonId: auth.lessonId } },
+      })
+      .catch(() => null),
+    prisma.user.update({
+      where: { id: auth.userId },
+      data: { lastActiveAt: new Date() },
+    }),
+  ]);
   return NextResponse.json({ completed: false });
 }

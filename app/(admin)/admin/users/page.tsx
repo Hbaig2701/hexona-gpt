@@ -17,7 +17,7 @@ interface UserItem {
   isActive: boolean;
   createdAt: string;
   lastActiveAt?: string;
-  _count: { conversations: number };
+  _count: { conversations: number; lessonCompletions: number };
 }
 
 export default function AdminUsersPage() {
@@ -134,8 +134,11 @@ export default function AdminUsersPage() {
               </Link>
 
               <div className="flex items-center gap-4 shrink-0 ml-4">
-                <span className="text-xs text-hex-text-muted">
+                <span className="text-xs text-hex-text-muted" title="Conversations with Advisors">
                   {user._count.conversations} convs
+                </span>
+                <span className="text-xs text-hex-text-muted" title="Lessons completed">
+                  {user._count.lessonCompletions} lessons
                 </span>
                 <span className="text-xs text-hex-text-muted">
                   {user.lastActiveAt

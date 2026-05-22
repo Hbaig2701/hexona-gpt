@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       isActive: true,
       createdAt: true,
       lastActiveAt: true,
-      _count: { select: { conversations: true } },
+      _count: { select: { conversations: true, lessonCompletions: true } },
     },
   });
 

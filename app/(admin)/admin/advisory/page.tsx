@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Library, UserCog, GraduationCap } from "lucide-react";
+import { BookOpen, Library, UserCog, GraduationCap, BarChart3 } from "lucide-react";
 import { prisma } from "@/lib/db/prisma";
 import Card from "@/components/ui/Card";
 import BackLink from "@/components/ui/BackLink";
@@ -7,11 +7,18 @@ import BackLink from "@/components/ui/BackLink";
 export const dynamic = "force-dynamic";
 
 export default async function AdminAdvisoryHubPage() {
-  const [courseCount, resourceCount, instructorCount, publishedCourses] = await Promise.all([
+  const [courseCount, resourceCount, instructorCount, publishedCourses, enrolledStudents] = await Promise.all([
     prisma.course.count(),
     prisma.resource.count(),
     prisma.instructor.count(),
     prisma.course.count({ where: { isPublished: true } }),
+    prisma.user.count({
+      where: {
+        isActive: true,
+        role: { not: "ADMIN" },
+        tier: { in: ["TIER_1", "TIER_2", "TIER_3"] },
+      },
+    }),
   ]);
 
   const sections = [
@@ -38,6 +45,14 @@ export default async function AdminAdvisoryHubPage() {
       icon: UserCog,
       href: "/admin/advisory/instructors",
       color: "#F59E0B",
+    },
+    {
+      title: "Analytics",
+      value: enrolledStudents,
+      subtitle: "Student progress & engagement",
+      icon: BarChart3,
+      href: "/admin/advisory/analytics",
+      color: "#10B981",
     },
   ];
 
