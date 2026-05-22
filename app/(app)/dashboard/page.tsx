@@ -85,8 +85,49 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Profile Snapshot */}
-      {profile?.completedAt && (
-        <ProfileSnapshot profile={profile} progress={progress} />
+      {profile?.completedAt && <ProfileSnapshot profile={profile} />}
+
+      {/* Continue Learning */}
+      {progress?.eligible && progress.course && (progress.totalLessons ?? 0) > 0 && (
+        <ContinueLearningCard progress={progress} />
+      )}
+
+      {/* Advisory secondary links */}
+      {progress?.eligible && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Link href="/advisory/resources">
+            <Card className="cursor-pointer flex items-center gap-4 !p-5 h-full">
+              <div className="w-11 h-11 rounded-xl bg-purple-500/15 flex items-center justify-center shrink-0">
+                <LucideIcons.Library size={20} className="text-purple-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[var(--hex-text-primary)] font-semibold text-sm">
+                  Resources
+                </p>
+                <p className="text-xs text-[var(--hex-text-muted)] mt-0.5">
+                  Templates, samples, flowcharts &amp; guides for your tier
+                </p>
+              </div>
+              <LucideIcons.ArrowRight size={16} className="text-[var(--hex-text-muted)] shrink-0" />
+            </Card>
+          </Link>
+          <Link href="/advisory/todos">
+            <Card className="cursor-pointer flex items-center gap-4 !p-5 h-full">
+              <div className="w-11 h-11 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                <LucideIcons.ListChecks size={20} className="text-amber-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[var(--hex-text-primary)] font-semibold text-sm">
+                  Personal Todos
+                </p>
+                <p className="text-xs text-[var(--hex-text-muted)] mt-0.5">
+                  Track action items as you work through the course
+                </p>
+              </div>
+              <LucideIcons.ArrowRight size={16} className="text-[var(--hex-text-muted)] shrink-0" />
+            </Card>
+          </Link>
+        </div>
       )}
 
       {/* Suggested Action */}
@@ -180,27 +221,22 @@ export default function DashboardPage() {
   );
 }
 
-function ProfileSnapshot({
-  profile,
-  progress,
-}: {
-  profile: AgencyProfile;
-  progress: CourseProgress | null;
-}) {
-  const hasProgress = !!(
-    progress?.eligible &&
-    progress.course &&
-    (progress.totalLessons ?? 0) > 0
-  );
+// Split values like "$20k/month (12-month target)" into a short headline number
+// and a subtitle, so the big text fits the card.
+function splitValue(raw: string): { primary: string; extra?: string } {
+  const m = raw.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+  if (m) return { primary: m[1].trim(), extra: m[2].trim() };
+  return { primary: raw.trim() };
+}
 
+function ProfileSnapshot({ profile }: { profile: AgencyProfile }) {
   const cards: {
     icon: React.ElementType;
     color: string;
     label: string;
     value: string;
     subtitle?: string;
-    href?: string;
-    progressPct?: number;
+    capitalize?: boolean;
   }[] = [];
 
   if (profile.niche) {
@@ -210,49 +246,45 @@ function ProfileSnapshot({
       label: "Niche",
       value: profile.niche,
       subtitle: "Your target market",
+      capitalize: true,
     });
   }
   if (profile.monthlyRevenue) {
+    const { primary, extra } = splitValue(profile.monthlyRevenue);
     cards.push({
       icon: LucideIcons.DollarSign,
       color: "#10B981",
       label: "Revenue",
-      value: profile.monthlyRevenue,
-      subtitle: "Current monthly",
+      value: primary,
+      subtitle: extra ?? "Current monthly",
     });
   }
   if (profile.revenueGoal) {
+    const { primary, extra } = splitValue(profile.revenueGoal);
     cards.push({
       icon: LucideIcons.TrendingUp,
       color: "#F59E0B",
       label: "Goal",
-      value: profile.revenueGoal,
-      subtitle: "12-month target",
-    });
-  }
-  if (hasProgress) {
-    cards.push({
-      icon: LucideIcons.GraduationCap,
-      color: "#00C4CC",
-      label: "Course Progress",
-      value: `${progress!.completionPct}%`,
-      subtitle: `${progress!.completedLessons} of ${progress!.totalLessons} lessons`,
-      href: progress!.nextLesson ? `/advisory/${progress!.nextLesson.slug}` : "/advisory",
-      progressPct: progress!.completionPct,
+      value: primary,
+      subtitle: extra ?? "12-month target",
     });
   }
 
   if (cards.length === 0) return null;
 
   const cols =
-    cards.length === 1 ? "grid-cols-1" : cards.length === 2 ? "sm:grid-cols-2" : cards.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-4";
+    cards.length === 1
+      ? "grid-cols-1"
+      : cards.length === 2
+      ? "sm:grid-cols-2"
+      : "sm:grid-cols-3";
 
   return (
     <div className={`grid gap-4 ${cols}`}>
       {cards.map((c) => {
         const Icon = c.icon;
-        const inner = (
-          <Card hoverable={!!c.href} className="!p-5 h-full">
+        return (
+          <Card key={c.label} hoverable={false} className="!p-5 h-full">
             <div className="flex items-center gap-3 mb-3">
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
@@ -264,29 +296,62 @@ function ProfileSnapshot({
                 {c.label}
               </span>
             </div>
-            <p className="text-2xl font-bold text-[var(--hex-text-primary)] truncate">{c.value}</p>
+            <p
+              className={`text-xl font-bold text-[var(--hex-text-primary)] leading-tight ${
+                c.capitalize ? "capitalize" : ""
+              }`}
+            >
+              {c.value}
+            </p>
             {c.subtitle && (
-              <p className="text-xs text-[var(--hex-text-muted)] mt-1 truncate">{c.subtitle}</p>
-            )}
-            {typeof c.progressPct === "number" && (
-              <div className="h-1.5 bg-hex-dark-700 rounded-full overflow-hidden mt-3">
-                <div
-                  className="h-full bg-gradient-to-r from-hex-teal to-[#0095A8]"
-                  style={{ width: `${c.progressPct}%` }}
-                />
-              </div>
+              <p className="text-xs text-[var(--hex-text-muted)] mt-1.5 truncate">{c.subtitle}</p>
             )}
           </Card>
         );
-        return c.href ? (
-          <Link key={c.label} href={c.href} className="block">
-            {inner}
-          </Link>
-        ) : (
-          <div key={c.label}>{inner}</div>
-        );
       })}
     </div>
+  );
+}
+
+function ContinueLearningCard({ progress }: { progress: CourseProgress }) {
+  const isComplete = !progress.nextLesson;
+  const href = progress.nextLesson ? `/advisory/${progress.nextLesson.slug}` : "/advisory";
+  const ctaLabel = isComplete ? "Review course" : "Continue lesson";
+
+  return (
+    <Link href={href} className="block group">
+      <Card
+        hoverable={false}
+        className="!p-6 border-hex-teal/20 hover:border-hex-teal/40 transition-colors"
+      >
+        <div className="flex items-center gap-5 flex-wrap">
+          <div className="w-12 h-12 rounded-xl bg-hex-teal/15 flex items-center justify-center shrink-0">
+            <LucideIcons.GraduationCap size={22} className="text-hex-teal" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs uppercase tracking-wider text-[var(--hex-text-muted)] font-semibold">
+              Continue Learning
+            </p>
+            <h3 className="font-display text-lg font-bold text-[var(--hex-text-primary)] truncate mt-0.5">
+              {isComplete ? "All lessons complete — nice work." : progress.nextLesson!.title}
+            </h3>
+            <p className="text-xs text-[var(--hex-text-muted)] mt-1">
+              {progress.completedLessons} of {progress.totalLessons} lessons · {progress.completionPct}%
+            </p>
+            <div className="h-1.5 bg-hex-dark-700 rounded-full overflow-hidden mt-2 max-w-md">
+              <div
+                className="h-full bg-gradient-to-r from-hex-teal to-[#0095A8]"
+                style={{ width: `${progress.completionPct}%` }}
+              />
+            </div>
+          </div>
+          <div className="inline-flex items-center gap-2 bg-gradient-to-br from-hex-teal to-[#0095A8] text-hex-dark-900 font-semibold px-5 py-2.5 rounded-lg group-hover:opacity-90 transition-opacity shrink-0">
+            {ctaLabel}
+            <LucideIcons.ArrowRight size={16} />
+          </div>
+        </div>
+      </Card>
+    </Link>
   );
 }
 
