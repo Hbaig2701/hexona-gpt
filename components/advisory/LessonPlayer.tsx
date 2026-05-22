@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { LessonType } from "@prisma/client";
 import LessonTable, { type TableData } from "./LessonTable";
+import { linkifyText } from "@/lib/linkify-text";
 
 interface LessonData {
   id: string;
@@ -87,7 +88,7 @@ export default function LessonPlayer({
           </h1>
           {lesson.description && (
             <p className="text-[var(--hex-text-secondary)] text-sm whitespace-pre-line">
-              {lesson.description}
+              {linkifyText(lesson.description)}
             </p>
           )}
         </div>
