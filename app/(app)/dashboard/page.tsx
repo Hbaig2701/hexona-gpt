@@ -31,10 +31,20 @@ interface AgencyProfile {
   completedAt?: string;
 }
 
+interface CourseProgress {
+  eligible: boolean;
+  course?: { id: string; title: string } | null;
+  totalLessons?: number;
+  completedLessons?: number;
+  completionPct?: number;
+  nextLesson?: { slug: string; title: string } | null;
+}
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([]);
   const [profile, setProfile] = useState<AgencyProfile | null>(null);
+  const [progress, setProgress] = useState<CourseProgress | null>(null);
 
   useEffect(() => {
     fetch("/api/conversations?limit=3")
@@ -45,6 +55,11 @@ export default function DashboardPage() {
     fetch("/api/profile")
       .then((r) => r.json())
       .then(setProfile)
+      .catch(() => {});
+
+    fetch("/api/advisory/progress")
+      .then((r) => r.json())
+      .then(setProgress)
       .catch(() => {});
   }, []);
 
@@ -71,28 +86,7 @@ export default function DashboardPage() {
 
       {/* Profile Snapshot */}
       {profile?.completedAt && (
-        <Card hoverable={false} className="!p-6">
-          <div className="flex flex-wrap gap-8">
-            {profile.niche && (
-              <div>
-                <span className="text-[var(--hex-text-muted)] text-xs uppercase tracking-wider">Niche</span>
-                <p className="text-[var(--hex-text-primary)] font-medium text-base mt-0.5">{profile.niche}</p>
-              </div>
-            )}
-            {profile.monthlyRevenue && (
-              <div>
-                <span className="text-[var(--hex-text-muted)] text-xs uppercase tracking-wider">Revenue</span>
-                <p className="text-[var(--hex-text-primary)] font-medium text-base mt-0.5">{profile.monthlyRevenue}</p>
-              </div>
-            )}
-            {profile.revenueGoal && (
-              <div>
-                <span className="text-[var(--hex-text-muted)] text-xs uppercase tracking-wider">Goal</span>
-                <p className="text-[var(--hex-text-primary)] font-medium text-base mt-0.5">{profile.revenueGoal}</p>
-              </div>
-            )}
-          </div>
-        </Card>
+        <ProfileSnapshot profile={profile} progress={progress} />
       )}
 
       {/* Suggested Action */}
@@ -182,6 +176,116 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function ProfileSnapshot({
+  profile,
+  progress,
+}: {
+  profile: AgencyProfile;
+  progress: CourseProgress | null;
+}) {
+  const hasProgress = !!(
+    progress?.eligible &&
+    progress.course &&
+    (progress.totalLessons ?? 0) > 0
+  );
+
+  const cards: {
+    icon: React.ElementType;
+    color: string;
+    label: string;
+    value: string;
+    subtitle?: string;
+    href?: string;
+    progressPct?: number;
+  }[] = [];
+
+  if (profile.niche) {
+    cards.push({
+      icon: LucideIcons.Target,
+      color: "#A855F7",
+      label: "Niche",
+      value: profile.niche,
+      subtitle: "Your target market",
+    });
+  }
+  if (profile.monthlyRevenue) {
+    cards.push({
+      icon: LucideIcons.DollarSign,
+      color: "#10B981",
+      label: "Revenue",
+      value: profile.monthlyRevenue,
+      subtitle: "Current monthly",
+    });
+  }
+  if (profile.revenueGoal) {
+    cards.push({
+      icon: LucideIcons.TrendingUp,
+      color: "#F59E0B",
+      label: "Goal",
+      value: profile.revenueGoal,
+      subtitle: "12-month target",
+    });
+  }
+  if (hasProgress) {
+    cards.push({
+      icon: LucideIcons.GraduationCap,
+      color: "#00C4CC",
+      label: "Course Progress",
+      value: `${progress!.completionPct}%`,
+      subtitle: `${progress!.completedLessons} of ${progress!.totalLessons} lessons`,
+      href: progress!.nextLesson ? `/advisory/${progress!.nextLesson.slug}` : "/advisory",
+      progressPct: progress!.completionPct,
+    });
+  }
+
+  if (cards.length === 0) return null;
+
+  const cols =
+    cards.length === 1 ? "grid-cols-1" : cards.length === 2 ? "sm:grid-cols-2" : cards.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-4";
+
+  return (
+    <div className={`grid gap-4 ${cols}`}>
+      {cards.map((c) => {
+        const Icon = c.icon;
+        const inner = (
+          <Card hoverable={!!c.href} className="!p-5 h-full">
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                style={{ backgroundColor: `${c.color}20` }}
+              >
+                <Icon size={18} style={{ color: c.color }} />
+              </div>
+              <span className="text-xs uppercase tracking-wider text-[var(--hex-text-muted)] font-semibold">
+                {c.label}
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-[var(--hex-text-primary)] truncate">{c.value}</p>
+            {c.subtitle && (
+              <p className="text-xs text-[var(--hex-text-muted)] mt-1 truncate">{c.subtitle}</p>
+            )}
+            {typeof c.progressPct === "number" && (
+              <div className="h-1.5 bg-hex-dark-700 rounded-full overflow-hidden mt-3">
+                <div
+                  className="h-full bg-gradient-to-r from-hex-teal to-[#0095A8]"
+                  style={{ width: `${c.progressPct}%` }}
+                />
+              </div>
+            )}
+          </Card>
+        );
+        return c.href ? (
+          <Link key={c.label} href={c.href} className="block">
+            {inner}
+          </Link>
+        ) : (
+          <div key={c.label}>{inner}</div>
+        );
+      })}
     </div>
   );
 }
