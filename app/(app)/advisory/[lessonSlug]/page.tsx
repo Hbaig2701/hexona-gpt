@@ -8,7 +8,7 @@ import LessonPlayer from "@/components/advisory/LessonPlayer";
 
 export const dynamic = "force-dynamic";
 
-const RESERVED_SLUGS = new Set(["resources", "todos"]);
+const RESERVED_SLUGS = new Set(["resources", "todos", "action-plan"]);
 
 export default async function LessonPage({
   params,

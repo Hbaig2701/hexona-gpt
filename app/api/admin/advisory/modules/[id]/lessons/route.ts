@@ -5,7 +5,7 @@ import { slugify } from "@/lib/advisory";
 
 export const dynamic = "force-dynamic";
 
-const RESERVED_SLUGS = new Set(["resources", "todos"]);
+const RESERVED_SLUGS = new Set(["resources", "todos", "action-plan"]);
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const auth = await requireAdmin();

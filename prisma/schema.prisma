@@ -30,6 +30,7 @@ model User {
   lessonCompletions LessonCompletion[]
   quizSubmissions   QuizSubmission[]
   advisoryTodos     AdvisoryTodo[]
+  actionItemCompletions ActionItemCompletion[]
 }
 
 enum UserRole {
@@ -389,4 +390,33 @@ model AdvisoryTodo {
   updatedAt   DateTime  @updatedAt
 
   @@index([userId, order])
+}
+
+// Curated, tier-scoped milestone checklist that mirrors the course journey.
+// Seeded in code for now (no admin CRUD yet); per-user progress in ActionItemCompletion.
+model ActionItem {
+  id           String                 @id @default(cuid())
+  title        String
+  description  String?
+  phase        String
+  requiredTier UserTier
+  order        Int                    @default(0)
+  isPublished  Boolean                @default(true)
+  completions  ActionItemCompletion[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  @@index([requiredTier, order])
+}
+
+model ActionItemCompletion {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actionItemId String
+  actionItem   ActionItem @relation(fields: [actionItemId], references: [id], onDelete: Cascade)
+  completedAt  DateTime   @default(now())
+
+  @@unique([userId, actionItemId])
+  @@index([userId])
 }

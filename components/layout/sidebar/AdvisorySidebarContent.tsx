@@ -8,6 +8,7 @@ import {
   BookOpen,
   ListChecks,
   Library,
+  Target,
   ChevronDown,
   ChevronRight,
   CheckCircle2,
@@ -50,7 +51,7 @@ export default function AdvisorySidebarContent() {
         // URL is /advisory/<lessonSlug> (or /advisory, /advisory/resources, /advisory/todos)
         const segment = pathname.split("/")[2];
         const isLessonRoute =
-          segment && segment !== "resources" && segment !== "todos";
+          segment && segment !== "resources" && segment !== "todos" && segment !== "action-plan";
         if (isLessonRoute) {
           for (const m of course.modules) {
             if (m.lessons.some((l) => l.slug === segment)) {
@@ -117,6 +118,13 @@ export default function AdvisorySidebarContent() {
       <Link href="/advisory" className={navLinkClass(isActive("/advisory"))}>
         <BookOpen size={18} />
         Course
+      </Link>
+      <Link
+        href="/advisory/action-plan"
+        className={navLinkClass(isActivePrefix("/advisory/action-plan"))}
+      >
+        <Target size={18} />
+        Action Plan
       </Link>
       <Link
         href="/advisory/resources"
