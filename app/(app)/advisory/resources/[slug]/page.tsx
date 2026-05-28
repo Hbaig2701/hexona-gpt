@@ -21,26 +21,49 @@ function parseTableData(value: unknown) {
   return null;
 }
 
+type ParsedListItem = {
+  title: string;
+  description?: string;
+  links: Array<{ label: string; url: string }>;
+};
+
+function parseListItems(arr: unknown): ParsedListItem[] {
+  return (Array.isArray(arr) ? arr : []).map((it) => {
+    const item = it as {
+      title?: string;
+      description?: string;
+      links?: Array<{ label?: string; url?: string }>;
+    };
+    return {
+      title: item.title ?? "",
+      description: item.description,
+      links: (item.links ?? [])
+        .map((l) => ({ label: l?.label ?? "Open", url: l?.url ?? "" }))
+        .filter((l) => l.url),
+    };
+  });
+}
+
 function parseListData(value: unknown) {
   if (!value || typeof value !== "object") return null;
-  const v = value as { items?: unknown };
-  if (!Array.isArray(v.items)) return null;
-  return {
-    items: v.items.map((it) => {
-      const item = it as {
-        title?: string;
-        description?: string;
-        links?: Array<{ label?: string; url?: string }>;
-      };
-      return {
-        title: item.title ?? "",
-        description: item.description,
-        links: (item.links ?? [])
-          .map((l) => ({ label: l?.label ?? "Open", url: l?.url ?? "" }))
-          .filter((l) => l.url),
-      };
-    }),
-  };
+  const v = value as { items?: unknown; groups?: unknown };
+
+  // Grouped form: { groups: [{ heading, items: [...] }] }
+  if (Array.isArray(v.groups)) {
+    return {
+      groups: v.groups.map((g) => {
+        const group = g as { heading?: string; items?: unknown };
+        return { heading: group.heading ?? "", items: parseListItems(group.items) };
+      }),
+    };
+  }
+
+  // Flat form: { items: [...] }
+  if (Array.isArray(v.items)) {
+    return { items: parseListItems(v.items) };
+  }
+
+  return null;
 }
 
 export default async function ResourceDetailPage({
