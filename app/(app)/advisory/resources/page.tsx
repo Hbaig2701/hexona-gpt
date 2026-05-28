@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { ExternalLink, List as ListIcon, Table as TableIcon, FileText } from "lucide-react";
+import { ExternalLink, List as ListIcon, Table as TableIcon, FileText, ChevronRight } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db/prisma";
 import { hasAdvisoryAccess } from "@/lib/advisory";
@@ -29,7 +29,7 @@ export default async function ResourcesPage() {
   }, {});
 
   return (
-    <div className="max-w-5xl mx-auto pb-8">
+    <div className="max-w-3xl mx-auto pb-8">
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-[var(--hex-text-primary)]">Resources</h1>
         <p className="text-[var(--hex-text-secondary)] mt-2 text-sm">
@@ -48,7 +48,7 @@ export default async function ResourcesPage() {
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--hex-text-muted)] mb-3">
                 {category}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-2">
                 {items.map((r) => {
                   const hasUrl = r.url && r.url.length > 0;
                   const hasList = !!r.listData;
@@ -63,8 +63,8 @@ export default async function ResourcesPage() {
                     ? TableIcon
                     : ExternalLink;
 
-                  const inner = (
-                    <Card className="flex items-start gap-3 h-full">
+                  const row = (
+                    <Card className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-hex-teal/10 flex items-center justify-center shrink-0">
                         <Icon size={18} className="text-hex-teal" />
                       </div>
@@ -73,7 +73,7 @@ export default async function ResourcesPage() {
                           {r.title}
                         </p>
                         {r.description && (
-                          <p className="text-xs text-[var(--hex-text-muted)] line-clamp-2 mt-0.5">
+                          <p className="text-xs text-[var(--hex-text-muted)] line-clamp-1 mt-0.5">
                             {r.description}
                           </p>
                         )}
@@ -81,29 +81,34 @@ export default async function ResourcesPage() {
                           <p className="text-xs text-hex-warning mt-1">Coming soon</p>
                         )}
                       </div>
+                      {inline ? (
+                        <ChevronRight size={16} className="text-[var(--hex-text-muted)] shrink-0" />
+                      ) : hasUrl ? (
+                        <ExternalLink size={15} className="text-[var(--hex-text-muted)] shrink-0" />
+                      ) : null}
                     </Card>
                   );
 
-                  // Inline (list or table) → in-app detail page
+                  // Inline (list / table / document) → in-app detail page
                   if (inline) {
                     return (
-                      <Link key={r.id} href={`/advisory/resources/${r.slug}`}>
-                        {inner}
+                      <Link key={r.id} href={`/advisory/resources/${r.slug}`} className="block">
+                        {row}
                       </Link>
                     );
                   }
                   // External link → open in new tab
                   if (hasUrl) {
                     return (
-                      <a key={r.id} href={r.url} target="_blank" rel="noopener noreferrer">
-                        {inner}
+                      <a key={r.id} href={r.url} target="_blank" rel="noopener noreferrer" className="block">
+                        {row}
                       </a>
                     );
                   }
-                  // Placeholder
+                  // Placeholder (no content yet)
                   return (
                     <div key={r.id} className="opacity-60 cursor-not-allowed">
-                      {inner}
+                      {row}
                     </div>
                   );
                 })}
