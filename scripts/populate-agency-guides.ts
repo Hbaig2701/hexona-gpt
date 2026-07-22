@@ -42,6 +42,12 @@ const GUIDES = [
     description: "The exact questions to ask on discovery calls to qualify and set up the close.",
     url: "https://docs.google.com/document/d/1tZ35sqg_jT2AZvg4MsBmRfEPqvSKFrIPTTXFzjo4FWY/edit?tab=t.dl4cceye4kgf#heading=h.cjw5blur3cgj",
   },
+  {
+    slug: "youtube-strategy-masterclass",
+    title: "Youtube Strategy Masterclass",
+    description: "Masterclass on using YouTube to build authority and generate inbound leads.",
+    url: "https://drive.google.com/file/d/126kPhY_00OfmejectgeuCYU7pOypazjH/view?usp=sharing",
+  },
 ];
 
 // Also wire the same document into the course's "Onboarding Checklist" lesson

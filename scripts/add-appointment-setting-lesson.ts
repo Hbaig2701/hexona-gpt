@@ -36,6 +36,20 @@ const LESSONS = [
     loomUrl: "https://www.loom.com/share/c4a7615fac314dd89bc6aa27d38cc70d",
     description: VOLODYMYR_NOTE,
   },
+  {
+    slug: "networking-and-events",
+    title: "Networking and Events",
+    loomUrl: "https://www.loom.com/share/c3351fb3197c472db321032170ef60e5",
+    description:
+      "How to use in-person networking and local events to book meetings — where to show up, how to work the room, and how to turn conversations into booked calls.",
+  },
+  {
+    slug: "chamber-of-commerce",
+    title: "Chamber of Commerce",
+    loomUrl: "https://www.loom.com/share/97b0fe08b791499e9a0368ef72224599",
+    description:
+      "Why your local Chamber of Commerce is an underrated pipeline for local business clients — and how to use membership to build relationships that turn into meetings.",
+  },
 ];
 
 async function main() {
