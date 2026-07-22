@@ -25,6 +25,21 @@ const LESSONS = [
     title: "How to Send Invoices + Subscriptions",
     loomUrl: "https://www.loom.com/share/8613b1953590468f9bb67202758ee958",
   },
+  {
+    slug: "intake-process",
+    title: "Intake Process",
+    loomUrl: "https://www.loom.com/share/1d28259873c247fe88dcad78d3bbb058",
+  },
+  {
+    slug: "orientation-and-training",
+    title: "Orientation and Training",
+    loomUrl: "https://www.loom.com/share/9645c02eba944b5699723f2b11b928ec",
+  },
+  {
+    slug: "roi-reminder-routine",
+    title: "ROI / Reminder Routine",
+    loomUrl: "https://www.loom.com/share/9a31e8ae46834188944f79c16c6c6c69",
+  },
 ];
 
 async function main() {
