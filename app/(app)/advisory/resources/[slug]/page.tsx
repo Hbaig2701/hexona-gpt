@@ -24,6 +24,7 @@ function parseTableData(value: unknown) {
 type ParsedListItem = {
   title: string;
   description?: string;
+  body?: string;
   links: Array<{ label: string; url: string }>;
 };
 
@@ -32,11 +33,13 @@ function parseListItems(arr: unknown): ParsedListItem[] {
     const item = it as {
       title?: string;
       description?: string;
+      body?: string;
       links?: Array<{ label?: string; url?: string }>;
     };
     return {
       title: item.title ?? "",
       description: item.description,
+      body: typeof item.body === "string" && item.body.trim() ? item.body : undefined,
       links: (item.links ?? [])
         .map((l) => ({ label: l?.label ?? "Open", url: l?.url ?? "" }))
         .filter((l) => l.url),

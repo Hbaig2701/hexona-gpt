@@ -7,6 +7,8 @@ import { ChevronDown, ExternalLink, Copy, Check } from "lucide-react";
 export type ResourceListItem = {
   title: string;
   description?: string;
+  // Full text content (e.g. an AI prompt) revealed inside the toggle
+  body?: string;
   links: Array<{ label: string; url: string }>;
 };
 
@@ -23,9 +25,9 @@ export default function ResourceList({ data }: Props) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  async function copyLink(key: string, url: string) {
+  async function copyText(key: string, text: string) {
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(text);
       setCopiedKey(key);
       setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1500);
     } catch {
@@ -54,7 +56,10 @@ export default function ResourceList({ data }: Props) {
             <ChevronDown size={16} />
           </motion.div>
           <p className="flex-1 font-medium text-hex-text-primary text-sm">{item.title}</p>
-          {!open && item.links.length > 0 && (
+          {!open && item.body && (
+            <span className="text-xs text-hex-text-muted">Prompt</span>
+          )}
+          {!open && !item.body && item.links.length > 0 && (
             <span className="text-xs text-hex-text-muted">
               {item.links.length} link{item.links.length !== 1 ? "s" : ""}
             </span>
@@ -76,6 +81,37 @@ export default function ResourceList({ data }: Props) {
                     {item.description}
                   </p>
                 )}
+                {item.body && (
+                  <div className="rounded-lg border border-hex-dark-500 bg-hex-dark-900/60 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-2 border-b border-hex-dark-500/60">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-hex-text-muted">
+                        Prompt
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => copyText(`${key}-body`, item.body!)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                          copiedKey === `${key}-body`
+                            ? "bg-hex-success/15 text-hex-success"
+                            : "bg-hex-dark-700 text-hex-text-muted hover:text-hex-text-primary"
+                        }`}
+                      >
+                        {copiedKey === `${key}-body` ? (
+                          <>
+                            <Check size={12} /> Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={12} /> Copy prompt
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <pre className="px-4 py-3 text-xs leading-relaxed text-hex-text-secondary whitespace-pre-wrap font-mono max-h-96 overflow-y-auto">
+                      {item.body}
+                    </pre>
+                  </div>
+                )}
                 {item.links.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {item.links.map((link, j) => {
@@ -94,7 +130,7 @@ export default function ResourceList({ data }: Props) {
                           </a>
                           <button
                             type="button"
-                            onClick={() => copyLink(linkKey, link.url)}
+                            onClick={() => copyText(linkKey, link.url)}
                             className={`px-2.5 py-1.5 text-xs font-medium border-l border-hex-dark-500 transition-colors ${
                               copied
                                 ? "bg-hex-success/15 text-hex-success"
