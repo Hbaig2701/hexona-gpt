@@ -36,6 +36,12 @@ const GUIDES = [
     description: "Checklist for onboarding new clients, start to finish.",
     url: "https://drive.google.com/file/d/1uOBKpxQU3wua9ud-1uP5rNka8CMK-1Vp/view?usp=sharing",
   },
+  {
+    slug: "discovery-call-question-bank",
+    title: "Discovery Call Question Bank",
+    description: "The exact questions to ask on discovery calls to qualify and set up the close.",
+    url: "https://docs.google.com/document/d/1tZ35sqg_jT2AZvg4MsBmRfEPqvSKFrIPTTXFzjo4FWY/edit?tab=t.dl4cceye4kgf#heading=h.cjw5blur3cgj",
+  },
 ];
 
 // Also wire the same document into the course's "Onboarding Checklist" lesson
