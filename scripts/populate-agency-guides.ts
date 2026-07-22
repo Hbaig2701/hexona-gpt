@@ -13,6 +13,12 @@ const CATEGORY = "Agency Guides";
 
 const GUIDES = [
   {
+    slug: "hiring-guide",
+    title: "Hiring and Operations Guide",
+    description: "How to hire, delegate, and run your agency's day-to-day operations.",
+    url: "https://drive.google.com/file/d/1EiG8GPY7w92bmvv8_YJeLFm3RgF12obo/view?usp=sharing",
+  },
+  {
     slug: "personal-branding-guide",
     title: "Personal Branding Guide",
     description: "How to build a personal brand that attracts agency clients.",
