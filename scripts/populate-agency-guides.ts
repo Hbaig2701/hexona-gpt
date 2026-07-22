@@ -30,7 +30,17 @@ const GUIDES = [
     description: "Playbook for selling and acquiring clients for your agency.",
     url: "https://drive.google.com/file/d/140EvvgB4eh5_aSbYmZGvBr-b-knhzDhg/view?usp=sharing",
   },
+  {
+    slug: "onboarding-checklist-guide",
+    title: "Onboarding Checklist",
+    description: "Checklist for onboarding new clients, start to finish.",
+    url: "https://drive.google.com/file/d/1uOBKpxQU3wua9ud-1uP5rNka8CMK-1Vp/view?usp=sharing",
+  },
 ];
+
+// Also wire the same document into the course's "Onboarding Checklist" lesson
+const CHECKLIST_LESSON_URL =
+  "https://drive.google.com/file/d/1uOBKpxQU3wua9ud-1uP5rNka8CMK-1Vp/view?usp=sharing";
 
 async function main() {
   const renamed = await prisma.resource.updateMany({
@@ -63,6 +73,12 @@ async function main() {
       console.log(`Created ${g.slug}`);
     }
   }
+
+  const lessonUpdate = await prisma.lesson.updateMany({
+    where: { slug: "onboarding-checklist" },
+    data: { externalUrl: CHECKLIST_LESSON_URL },
+  });
+  console.log(`Linked checklist doc on ${lessonUpdate.count} lesson(s)`);
 
   await prisma.$disconnect();
 }
