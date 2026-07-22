@@ -86,7 +86,8 @@ async function main() {
     },
   });
 
-  for (const [i, l] of sourceLessons.entries()) {
+  for (let i = 0; i < sourceLessons.length; i++) {
+    const l = sourceLessons[i];
     await prisma.lesson.create({
       data: {
         moduleId: newModule.id,
