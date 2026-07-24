@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Fraunces } from "next/font/google";
 import ResourceVaultApp from "./ResourceVaultApp";
 
 // Public standalone page — outside the (app) route group, no login required.
 
-const bricolage = Bricolage_Grotesque({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-ghl-display",
+  variable: "--font-vault-display",
   display: "swap",
 });
 
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function ResourceVaultPage() {
   return (
-    <div className={bricolage.variable}>
+    <div className={fraunces.variable}>
       <ResourceVaultApp />
     </div>
   );
