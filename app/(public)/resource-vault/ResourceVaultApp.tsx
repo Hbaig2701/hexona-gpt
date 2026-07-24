@@ -1,23 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, ChevronDown, X } from "lucide-react";
+import { ArrowUpRight, Check, ChevronDown, Copy, FileText, X } from "lucide-react";
 import {
   VAULT_CATEGORIES,
   type VaultIndustry,
 } from "@/lib/resource-vault/industries";
+import { getWebsitePrompt } from "@/lib/resource-vault/website-prompts";
 
 export default function ResourceVaultApp() {
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [selected, setSelected] = useState<VaultIndustry | null>(null);
+  const [promptView, setPromptView] = useState<VaultIndustry | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setSelected(null);
+      if (e.key === "Escape") {
+        setPromptView(null);
+        setSelected(null);
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  function copyPrompt(text: string) {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   const templatesOpen = openSection === "industry-templates";
 
@@ -163,15 +175,16 @@ export default function ResourceVaultApp() {
               >
                 Snapshot Link <ArrowUpRight size={16} strokeWidth={2} />
               </a>
-              {selected.websitePromptUrl ? (
-                <a
-                  href={selected.websitePromptUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-xl border border-black/15 bg-white px-5 py-3.5 text-sm font-semibold text-[#161616] shadow-[0_1px_2px_rgba(22,22,22,0.06)] transition-all hover:-translate-y-px hover:border-black/30"
+              {getWebsitePrompt(selected.name) ? (
+                <button
+                  onClick={() => {
+                    setPromptView(selected);
+                    setCopied(false);
+                  }}
+                  className="flex w-full items-center justify-between rounded-xl border border-black/15 bg-white px-5 py-3.5 text-sm font-semibold text-[#161616] shadow-[0_1px_2px_rgba(22,22,22,0.06)] transition-all hover:-translate-y-px hover:border-black/30"
                 >
-                  Website Prompt <ArrowUpRight size={16} strokeWidth={2} />
-                </a>
+                  Website Prompt <FileText size={16} strokeWidth={2} />
+                </button>
               ) : (
                 <div className="flex items-center justify-between rounded-xl border border-dashed border-black/15 bg-[#FAF8F4] px-5 py-3.5 text-sm text-[#A5A39B]">
                   Website Prompt
@@ -180,6 +193,67 @@ export default function ResourceVaultApp() {
                   </span>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Website prompt viewer */}
+      {promptView && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-[#161616]/45 p-4 backdrop-blur-[3px]"
+          onClick={() => setPromptView(null)}
+        >
+          <div
+            className="flex max-h-[85dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-black/[0.12] bg-white shadow-[0_10px_20px_rgba(22,22,22,0.12),0_32px_80px_-12px_rgba(22,22,22,0.35)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-black/[0.08] px-6 py-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl leading-none">{promptView.emoji}</span>
+                <div>
+                  <h2 className="text-base font-semibold leading-tight tracking-tight [font-family:var(--font-vault-display)]">
+                    {promptView.name}
+                  </h2>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A5A39B]">
+                    Website Prompt
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPromptView(null)}
+                aria-label="Close"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white text-[#8A8880] shadow-[0_1px_2px_rgba(22,22,22,0.08)] transition-colors hover:border-black/25 hover:text-[#161616]"
+              >
+                <X size={14} strokeWidth={2} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-[#FCFBF9] px-6 py-5">
+              <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#3A3934] [font-family:inherit]">
+                {getWebsitePrompt(promptView.name)}
+              </pre>
+            </div>
+
+            <div className="border-t border-black/[0.08] bg-white px-6 py-4">
+              <button
+                onClick={() => copyPrompt(getWebsitePrompt(promptView.name) ?? "")}
+                className={`flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold transition-all ${
+                  copied
+                    ? "bg-[#1D7A46] text-white"
+                    : "bg-[#161616] text-white shadow-[0_2px_0_rgba(0,0,0,0.3),0_8px_20px_-4px_rgba(22,22,22,0.4)] hover:-translate-y-px hover:bg-black"
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <Check size={16} strokeWidth={2.5} /> Copied to clipboard
+                  </>
+                ) : (
+                  <>
+                    <Copy size={16} strokeWidth={2} /> Copy Prompt
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
