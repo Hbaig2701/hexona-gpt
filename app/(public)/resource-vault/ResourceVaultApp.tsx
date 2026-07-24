@@ -55,7 +55,7 @@ export default function ResourceVaultApp() {
             </div>
             <div>
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8A8880]">
-                Free for agency owners
+                Free for Hamza&apos;s GHL Affiliates
               </p>
               <h1 className="text-[2rem] font-semibold leading-tight tracking-tight sm:text-[2.5rem] [font-family:var(--font-vault-display)]">
                 Hamza&apos;s Resource Vault
