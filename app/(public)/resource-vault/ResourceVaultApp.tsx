@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Check, ChevronDown, Copy, FileText, X } from "lucide-react";
+import { ArrowUpRight, Check, ChevronDown, Copy, FileText, Lock, X } from "lucide-react";
 import {
   VAULT_CATEGORIES,
   type VaultIndustry,
@@ -13,6 +13,11 @@ export default function ResourceVaultApp() {
   const [selected, setSelected] = useState<VaultIndustry | null>(null);
   const [promptView, setPromptView] = useState<VaultIndustry | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // In-memory only (no storage), so the gate re-prompts on every load and refresh.
+  const [unlocked, setUnlocked] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinError, setPinError] = useState(false);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -29,6 +34,85 @@ export default function ResourceVaultApp() {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function submitPin(value: string) {
+    if (value === "2701") {
+      setUnlocked(true);
+      setPinError(false);
+    } else {
+      setPinError(true);
+      setPin("");
+    }
+  }
+
+  function onPinChange(raw: string) {
+    const digits = raw.replace(/\D/g, "").slice(0, 4);
+    setPin(digits);
+    setPinError(false);
+    if (digits.length === 4) submitPin(digits);
+  }
+
+  if (!unlocked) {
+    return (
+      <div
+        className="flex min-h-dvh items-center justify-center bg-[#F1EFE9] px-5 text-[#161616] antialiased"
+        style={{
+          backgroundImage: [
+            "radial-gradient(60rem 30rem at 50% -8rem, rgba(255,255,255,0.9), transparent)",
+            "radial-gradient(rgba(22,22,22,0.045) 1px, transparent 1px)",
+          ].join(", "),
+          backgroundSize: "auto, 22px 22px",
+        }}
+      >
+        <div className="w-full max-w-sm rounded-2xl border border-black/[0.12] bg-white p-8 text-center shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_1px_3px_rgba(22,22,22,0.06),0_16px_40px_-12px_rgba(22,22,22,0.18)]">
+          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#161616] shadow-[0_2px_0_rgba(0,0,0,0.25),0_10px_24px_rgba(22,22,22,0.28)]">
+            <Lock size={20} className="text-white" strokeWidth={2} />
+          </div>
+          <h1 className="text-[1.6rem] font-semibold leading-tight tracking-tight [font-family:var(--font-vault-display)]">
+            Hamza&apos;s Resource Vault
+          </h1>
+          <p className="mt-2 text-[14px] leading-relaxed text-[#6E6C64]">
+            Enter your 4-digit access PIN to continue.
+          </p>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              submitPin(pin);
+            }}
+            className="mt-7"
+          >
+            <input
+              autoFocus
+              type="password"
+              inputMode="numeric"
+              autoComplete="off"
+              value={pin}
+              onChange={(e) => onPinChange(e.target.value)}
+              aria-label="4-digit access PIN"
+              className={`w-full rounded-xl border bg-[#FCFBF9] px-5 py-4 text-center text-2xl font-semibold tracking-[0.6em] text-[#161616] outline-none transition-colors placeholder:tracking-[0.6em] placeholder:text-[#C9C6BE] ${
+                pinError
+                  ? "border-[#C0392B] focus:border-[#C0392B]"
+                  : "border-black/15 focus:border-[#161616]"
+              }`}
+              placeholder="••••"
+            />
+            {pinError && (
+              <p className="mt-3 text-[13px] font-medium text-[#C0392B]">
+                Incorrect PIN. Please try again.
+              </p>
+            )}
+            <button
+              type="submit"
+              className="mt-5 w-full rounded-xl bg-[#161616] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_2px_0_rgba(0,0,0,0.3),0_8px_20px_-4px_rgba(22,22,22,0.4)] transition-all hover:-translate-y-px hover:bg-black"
+            >
+              Unlock
+            </button>
+          </form>
+        </div>
+      </div>
+    );
   }
 
   const templatesOpen = openSection === "industry-templates";
