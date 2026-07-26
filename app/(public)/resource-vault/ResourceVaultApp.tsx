@@ -211,10 +211,6 @@ export default function ResourceVaultApp() {
             </div>
           )}
 
-          {/* Future sections */}
-          <div className="border-t border-black/[0.09] bg-white px-6 py-4 sm:px-8">
-            <p className="text-[13px] text-[#B4B2AA]">More sections coming soon</p>
-          </div>
         </div>
 
         <p className="mx-auto mt-8 max-w-md text-center text-[11px] leading-relaxed text-[#A5A39B]">
