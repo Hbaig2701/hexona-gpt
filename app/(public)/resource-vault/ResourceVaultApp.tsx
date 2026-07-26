@@ -8,6 +8,25 @@ import {
 } from "@/lib/resource-vault/industries";
 import { getWebsitePrompt } from "@/lib/resource-vault/website-prompts";
 
+const ASK_AI_PROMPTS = [
+  {
+    title: "Lead Scraping Prompt",
+    url: "https://docs.google.com/document/d/1gn0_sppBIhVFZKBai_Cf73S6GNPCY9EJIwSEjfbyijU/edit?tab=t.0",
+  },
+  {
+    title: "Automatic Social Media Content",
+    url: "https://docs.google.com/document/d/1XpH81Aze1fC_8DT-KIIbv4lllD5C5JDuoOSEHFd8e48/edit?tab=t.0",
+  },
+  {
+    title: "Control GHL From Your Phone",
+    url: "https://docs.google.com/document/d/1e6kmnO32Rm5KQAkowEZUoU8QWZwHddixjVgZmTbZV70/edit?tab=t.0",
+  },
+  {
+    title: "Self-Improving Website",
+    url: "https://docs.google.com/document/d/1hrF6cDxIYUb41wC_DjKhMv2ptWvaAW3VOuR4tsfkP-4/edit?tab=t.0",
+  },
+];
+
 export default function ResourceVaultApp() {
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [selected, setSelected] = useState<VaultIndustry | null>(null);
@@ -116,6 +135,7 @@ export default function ResourceVaultApp() {
   }
 
   const templatesOpen = openSection === "industry-templates";
+  const askAiOpen = openSection === "ask-ai";
 
   return (
     <div
@@ -211,6 +231,48 @@ export default function ResourceVaultApp() {
             </div>
           )}
 
+          {/* Section: Ask AI Prompts */}
+          <button
+            onClick={() => setOpenSection(askAiOpen ? null : "ask-ai")}
+            className="flex w-full items-center gap-5 border-t border-black/[0.09] px-6 py-5 text-left transition-colors hover:bg-[#FAF8F4] sm:px-8"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-semibold tracking-tight text-[#161616]">
+                Ask AI Prompts
+                <span className="ml-2 font-normal text-[#8A8880]">
+                  — Ready-to-run GHL Ask AI prompts
+                </span>
+              </p>
+            </div>
+            <div
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${
+                askAiOpen
+                  ? "rotate-180 border-black/20 bg-[#161616] text-white"
+                  : "border-black/15 bg-white text-[#6E6C64] shadow-[0_1px_2px_rgba(22,22,22,0.08)]"
+              }`}
+            >
+              <ChevronDown size={15} strokeWidth={2} />
+            </div>
+          </button>
+
+          {askAiOpen && (
+            <div className="border-t border-black/[0.06] bg-[#F6F4EF] px-6 py-6 shadow-[0_2px_6px_rgba(22,22,22,0.05)_inset] sm:px-8">
+              <div className="space-y-2.5">
+                {ASK_AI_PROMPTS.map((p) => (
+                  <a
+                    key={p.title}
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-4 rounded-xl border border-black/[0.10] bg-white px-5 py-4 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_1px_2px_rgba(22,22,22,0.05),0_3px_8px_-2px_rgba(22,22,22,0.08)] transition-all duration-150 hover:-translate-y-0.5 hover:border-black/25 hover:shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_2px_4px_rgba(22,22,22,0.06),0_12px_24px_-6px_rgba(22,22,22,0.18)]"
+                  >
+                    <span className="text-[14px] font-medium text-[#3A3934]">{p.title}</span>
+                    <ArrowUpRight size={16} strokeWidth={2} className="shrink-0 text-[#8A8880]" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <p className="mx-auto mt-8 max-w-md text-center text-[11px] leading-relaxed text-[#A5A39B]">
