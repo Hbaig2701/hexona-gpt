@@ -1,4 +1,4 @@
-// Website prompts — Cleaning Services (generated from the dental master template)
+// Website prompts: Cleaning Services (generated from the dental master template)
 export const CLEANING_PROMPTS: Record<string, string> = {
   "Chimney": `Build a complete multi-page website for the chimney sweep and repair company described in the BUSINESS DETAILS section at the very end. Use those details everywhere and never invent facts. If a detail is missing, still build the full site with clearly marked placeholders (for example "[COMPANY NAME]", "[4.9 stars - 250+ reviews]", "[$XXX-$XXX per sweep]", "[TECHNICIAN NAME]"). Never fabricate a real-looking number, name, or review.
 

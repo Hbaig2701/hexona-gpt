@@ -1,4 +1,4 @@
-// Website prompts — Home Exterior Services A (generated from the dental master template)
+// Website prompts: Home Exterior Services A (generated from the dental master template)
 export const HOME_EXTERIOR_A_PROMPTS: Record<string, string> = {
   "Gutter Installation": `Build a complete multi-page website for the gutter installation company described in BUSINESS DETAILS at the end of this prompt. Use those details everywhere; never invent facts. Missing or blank details become clearly marked placeholders (for example "[COMPANY NAME]", "[4.9 stars - 180+ reviews]", "[$X-$X per linear foot]"). Never fabricate a real-looking number, name, or review.
 

@@ -1,4 +1,4 @@
-// Website prompts — Professional Services A (generated from the dental master template)
+// Website prompts: Professional Services A (generated from the dental master template)
 export const PROFESSIONAL_A_PROMPTS: Record<string, string> = {
   "Professional Organizer": `Build a complete multi-page website for the home and office organizing service described in the BUSINESS DETAILS section at the very end of this prompt. Use those details everywhere and never invent facts that are not listed there. If a detail is missing or the section is left blank, still build the full site exactly as specified using clearly marked placeholders (for example "[BUSINESS NAME]", "[4.9 stars - 150+ reviews]", "[$XX-$XX per hour]", "[OWNER NAME]") so every placeholder is easy to find and swap later. Never fabricate a real-looking number, name, or review to fill a gap.
 

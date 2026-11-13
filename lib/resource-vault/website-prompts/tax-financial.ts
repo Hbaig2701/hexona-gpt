@@ -1,4 +1,4 @@
-// Website prompts — Tax and Financial Services (generated from the dental master template)
+// Website prompts: Tax and Financial Services (generated from the dental master template)
 
 const TAX_PREP = `Build a complete multi-page website for the tax preparation firm described in the BUSINESS DETAILS section at the very end of this prompt. Use those details everywhere; do not invent facts that are not listed there. If a detail is missing or the BUSINESS DETAILS section is left entirely blank, still build the full site exactly as specified - just use clearly marked placeholders in place of the missing facts (for example "[FIRM NAME]", "[4.9 stars - 180+ reviews]", "[$XXX-$XXX]", "[PREPARER NAME, EA]") so every placeholder is easy to find and swap later. Never fabricate a real-looking number, name, or review to fill a gap.
 

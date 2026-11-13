@@ -1,4 +1,4 @@
-// Website prompts — Home Improvement and Handyman (generated from the dental master template)
+// Website prompts: Home Improvement and Handyman (generated from the dental master template)
 export const HOME_IMPROVEMENT_PROMPTS: Record<string, string> = {
   "Home Improvement and Handyman": `Build a complete multi-page website for the home improvement and handyman company described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing or the section is blank, still build the full site using clearly marked placeholders such as "[COMPANY NAME]", "[4.8 stars - 200+ reviews]", "[$XXX-$XXX]", "[OWNER NAME]". Never fabricate a real-looking number, name, or review.
 

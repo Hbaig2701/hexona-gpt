@@ -1,4 +1,4 @@
-// Website prompts — Professional Services B (generated from the dental master template)
+// Website prompts: Professional Services B (generated from the dental master template)
 export const PROFESSIONAL_B_PROMPTS: Record<string, string> = {
   "Travel Agent": `Build a complete multi-page website for the boutique travel agency described in the BUSINESS DETAILS section at the end. Use only those details; never invent facts. If a detail is missing or the section is blank, still build everything as specified, with clearly marked placeholders (for example "[AGENCY NAME]", "[4.9 stars - 180+ reviews]", "[TRIP DESIGN FEE $XXX]", "[ADVISOR NAME]") that are easy to swap. Never fabricate a real-looking number, name, or review.
 

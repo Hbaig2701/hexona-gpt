@@ -1,6 +1,6 @@
 // Industry snapshot catalog for the public /resource-vault page.
 // Transcribed from 100_Snapshot_Vault_with_links.csv (names kept as provided,
-// minus the " Snapshot" suffix). websitePromptUrl is null until links exist —
+// minus the " Snapshot" suffix). websitePromptUrl is null until links exist,
 // the UI shows "Coming soon" for those.
 
 export interface VaultIndustry {

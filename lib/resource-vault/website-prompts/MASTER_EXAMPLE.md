@@ -1,11 +1,11 @@
-# Website Master Prompt — Dental (reference example)
+# Website Master Prompt: Dental (reference example)
 
 This is Hamza's master website prompt for a dental clinic. Every industry website
 prompt in this directory mirrors this structure, customized per niche.
 
 ---
 
-Build a complete multi-page website for the dental practice described in the BUSINESS DETAILS section at the very end of this prompt. Use those details everywhere; do not invent facts that are not listed there. If a detail is missing or the BUSINESS DETAILS section is left entirely blank, still build the full site exactly as specified — just use clearly marked placeholders in place of the missing facts (for example "[PRACTICE NAME]", "[4.9 stars - 300+ reviews]", "[$XXX-$XXX]", "[DR. NAME]") so every placeholder is easy to find and swap later. Never fabricate a real-looking number, name, or review to fill a gap.
+Build a complete multi-page website for the dental practice described in the BUSINESS DETAILS section at the very end of this prompt. Use those details everywhere; do not invent facts that are not listed there. If a detail is missing or the BUSINESS DETAILS section is left entirely blank, still build the full site exactly as specified, just use clearly marked placeholders in place of the missing facts (for example "[PRACTICE NAME]", "[4.9 stars - 300+ reviews]", "[$XXX-$XXX]", "[DR. NAME]") so every placeholder is easy to find and swap later. Never fabricate a real-looking number, name, or review to fill a gap.
 
 This must feel like a premium, custom-designed site, not a template: modern, calm, confident, generous white space, and smooth subtle animations throughout. Gentle fade-up on each section as it scrolls into view (once only), soft hover lift on cards and buttons, animated count-up numbers for stats, smooth transitions between pages and quiz steps. Never busy, never flashy. The feeling is: a calm, modern clinic you instantly trust.
 

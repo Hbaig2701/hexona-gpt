@@ -1,4 +1,4 @@
-// Website prompts — Home Exterior Services B (generated from the dental master template)
+// Website prompts: Home Exterior Services B (generated from the dental master template)
 export const HOME_EXTERIOR_B_PROMPTS: Record<string, string> = {
   "Cleaning Company": [
     "Build a complete multi-page website for the residential cleaning company described in BUSINESS DETAILS at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build the full site with clearly marked placeholders such as \"[COMPANY NAME]\", \"[4.8 stars - 200+ reviews]\", \"[$XXX-$XXX per visit]\", \"[OWNER NAME]\". Never fabricate a real-looking number, name, or review.",

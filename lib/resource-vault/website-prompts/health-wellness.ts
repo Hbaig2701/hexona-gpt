@@ -1,11 +1,11 @@
-// Website prompts — Health and Wellness (generated from the dental master template)
+// Website prompts: Health and Wellness (generated from the dental master template)
 export const HEALTH_WELLNESS_PROMPTS: Record<string, string> = {
-  "Personal Trainer": `Build a complete multi-page website for the independent personal trainer described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing or the section is blank, still build the full site with clearly marked placeholders (for example "[TRAINER NAME]", "[4.9 stars - 150+ reviews]", "[$XX per session]", "[CERTIFICATION]") — never fabricate a real-looking number, name, or review.
+  "Personal Trainer": `Build a complete multi-page website for the independent personal trainer described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing or the section is blank, still build the full site with clearly marked placeholders (for example "[TRAINER NAME]", "[4.9 stars - 150+ reviews]", "[$XX per session]", "[CERTIFICATION]"). Never fabricate a real-looking number, name, or review.
 
-The site must feel premium and custom, never templated: modern, confident, generous white space, subtle animation only — gentle fade-up per section (once), hover lift on cards and buttons, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a coach in your corner who takes you seriously from day one.
+The site must feel premium and custom, never templated: modern, confident, generous white space, subtle animation only: gentle fade-up per section (once), hover lift on cards and buttons, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a coach in your corner who takes you seriously from day one.
 
 BRAND
-Colors: deep charcoal (#1F2937), warm off-white (#FAFAF7), burnt orange (#EA580C) accents, slate (#475569) text — swap for brand colors in BUSINESS DETAILS if provided. Typography: condensed sans headlines, humanist sans body. Imagery: real coaching moments in natural light; no oiled bodybuilder stock, no rows of empty machines, no salad-pointing models. Tone: direct, encouraging, zero shame, written for someone who has started and stopped before and fears being judged.
+Colors: deep charcoal (#1F2937), warm off-white (#FAFAF7), burnt orange (#EA580C) accents, slate (#475569) text. Swap for brand colors in BUSINESS DETAILS if provided. Typography: condensed sans headlines, humanist sans body. Imagery: real coaching moments in natural light; no oiled bodybuilder stock, no rows of empty machines, no salad-pointing models. Tone: direct, encouraging, zero shame, written for someone who has started and stopped before and fears being judged.
 
 BUILD 6 PAGES:
 
@@ -79,12 +79,12 @@ Pipeline for quiz/quote leads: New Leads pipeline, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Fitness Coach": `Build a complete multi-page website for the online and hybrid fitness coaching business described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing or the section is blank, still build the full site with clearly marked placeholders (for example "[COACH NAME]", "[$XXX/month]", "[4.8 stars - 90+ reviews]") — never fabricate a real-looking number, name, or review.
+  "Fitness Coach": `Build a complete multi-page website for the online and hybrid fitness coaching business described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing or the section is blank, still build the full site with clearly marked placeholders (for example "[COACH NAME]", "[$XXX/month]", "[4.8 stars - 90+ reviews]"). Never fabricate a real-looking number, name, or review.
 
-The site must feel premium and custom, never templated: modern, calm, structured, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a smart, structured coaching program that finally fits your real life.
+The site must feel premium and custom, never templated: modern, calm, structured, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a smart, structured coaching program that finally fits your real life.
 
 BRAND
-Colors: deep indigo (#3730A3), crisp off-white (#FAFAFC), fresh mint (#6EE7B7) accents, slate (#1E293B) text — swap for brand colors in BUSINESS DETAILS if provided. Typography: geometric sans headlines, readable sans body. Imagery: real people training in garages, living rooms and ordinary gyms, phone-in-hand check-ins; no six-pack close-ups, no beach-sprint stock, no neon "beast mode" cliches. Tone: clear, practical, hype-free, for a busy adult who wants a plan that survives a stressful week.
+Colors: deep indigo (#3730A3), crisp off-white (#FAFAFC), fresh mint (#6EE7B7) accents, slate (#1E293B) text. Swap for brand colors in BUSINESS DETAILS if provided. Typography: geometric sans headlines, readable sans body. Imagery: real people training in garages, living rooms and ordinary gyms, phone-in-hand check-ins; no six-pack close-ups, no beach-sprint stock, no neon "beast mode" cliches. Tone: clear, practical, hype-free, for a busy adult who wants a plan that survives a stressful week.
 
 BUILD 6 PAGES:
 
@@ -157,14 +157,14 @@ Pipeline for quiz/quote leads: New Leads pipeline, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Physical Therapy": `Build a complete multi-page website for the physical therapy clinic described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[CLINIC NAME]", "[PT NAME, DPT]", "[$XXX self-pay rate]") — never fabricate a real-looking number, name, or review.
+  "Physical Therapy": `Build a complete multi-page website for the physical therapy clinic described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[CLINIC NAME]", "[PT NAME, DPT]", "[$XXX self-pay rate]"). Never fabricate a real-looking number, name, or review.
 
-The site must feel premium and custom, never templated: modern, calm, capable, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a calm, capable clinic that takes your pain seriously and gets you moving again.
+The site must feel premium and custom, never templated: modern, calm, capable, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a calm, capable clinic that takes your pain seriously and gets you moving again.
 
-HEALTH RULES: never promise outcomes or timelines and never diagnose — the site invites an evaluation with a licensed physical therapist; results are talking points for that visit. Proof is clinic stats and testimonials, never before/after imagery.
+HEALTH RULES: never promise outcomes or timelines and never diagnose. The site invites an evaluation with a licensed physical therapist; results are talking points for that visit. Proof is clinic stats and testimonials, never before/after imagery.
 
 BRAND
-Colors: deep blue-teal (#0E7490), warm off-white (#FAF9F7), soft sky (#DBEAFE) accents, charcoal (#1F2933) text — swap for any brand colors in BUSINESS DETAILS. Typography: humane serif headlines, clean sans body. Imagery: bright treatment spaces, therapists guiding real movement, all ages; no skeleton diagrams, no glowing-red-joint stock photos. Tone: plain English, warm, unhurried, zero jargon, for someone tired of being bounced around the system.
+Colors: deep blue-teal (#0E7490), warm off-white (#FAF9F7), soft sky (#DBEAFE) accents, charcoal (#1F2933) text. Swap for any brand colors in BUSINESS DETAILS. Typography: humane serif headlines, clean sans body. Imagery: bright treatment spaces, therapists guiding real movement, all ages; no skeleton diagrams, no glowing-red-joint stock photos. Tone: plain English, warm, unhurried, zero jargon, for someone tired of being bounced around the system.
 
 BUILD 6 PAGES:
 
@@ -237,14 +237,14 @@ Quiz/quote lead pipeline: New Leads, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Nutrition & Wellness": `Build a complete multi-page website for the nutrition and wellness coaching practice described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[COACH NAME]", "[CERTIFICATION]", "[$XXX/month]") — never fabricate a real-looking number, name, or review.
+  "Nutrition & Wellness": `Build a complete multi-page website for the nutrition and wellness coaching practice described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[COACH NAME]", "[CERTIFICATION]", "[$XXX/month]"). Never fabricate a real-looking number, name, or review.
 
-The site must feel premium and custom, never templated: modern, warm, unhurried, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a kind, realistic guide who is on your side - not another diet.
+The site must feel premium and custom, never templated: modern, warm, unhurried, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a kind, realistic guide who is on your side - not another diet.
 
 HEALTH RULES: never promise weight loss amounts, cures, or health outcomes; the practice coaches habits and does not diagnose or treat conditions. Add a natural "we work alongside your doctor, not instead of them" line, and "results vary" wherever client stories appear.
 
 BRAND
-Colors: sage green (#7C9070), cream (#FDFBF7), soft terracotta (#C97B5D) accents, deep olive-charcoal (#2F3327) text — swap for any brand colors in BUSINESS DETAILS. Typography: warm serif headlines, friendly rounded sans body. Imagery: real kitchens, colorful everyday meals, people cooking together in natural light; no waist measuring tapes, no smoothie-holding models, no "guilt-free" cliches. Tone: gentle, practical, zero food guilt, for someone tired of starting over every Monday.
+Colors: sage green (#7C9070), cream (#FDFBF7), soft terracotta (#C97B5D) accents, deep olive-charcoal (#2F3327) text. Swap for any brand colors in BUSINESS DETAILS. Typography: warm serif headlines, friendly rounded sans body. Imagery: real kitchens, colorful everyday meals, people cooking together in natural light; no waist measuring tapes, no smoothie-holding models, no "guilt-free" cliches. Tone: gentle, practical, zero food guilt, for someone tired of starting over every Monday.
 
 BUILD 6 PAGES:
 
@@ -317,14 +317,14 @@ Quiz/quote lead pipeline: New Leads, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Podiatrist": `Build a complete multi-page website for the podiatry clinic described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[DR. NAME, DPM]", "[CLINIC NAME]", "[$XXX new patient visit]") — never fabricate a real-looking number, name, or review.
+  "Podiatrist": `Build a complete multi-page website for the podiatry clinic described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[DR. NAME, DPM]", "[CLINIC NAME]", "[$XXX new patient visit]"). Never fabricate a real-looking number, name, or review.
 
-The site must feel premium and custom, never templated: modern, calm, professional, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a professional clinic that takes your foot pain seriously and can see you this week.
+The site must feel premium and custom, never templated: modern, calm, professional, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a professional clinic that takes your foot pain seriously and can see you this week.
 
-HEALTH RULES: never promise outcomes and never diagnose — the site invites an assessment with a licensed podiatrist; every quiz result is "worth having examined", never a conclusion. Testimonials, not graphic clinical imagery.
+HEALTH RULES: never promise outcomes and never diagnose. The site invites an assessment with a licensed podiatrist; every quiz result is "worth having examined", never a conclusion. Testimonials, not graphic clinical imagery.
 
 BRAND
-Colors: deep navy (#1E3A5F), soft off-white (#F9FAFB), calm sky blue (#BFDBFE) accents, charcoal (#1F2933) text — swap for any brand colors in BUSINESS DETAILS. Typography: confident serif headlines, clean sans body. Imagery: people walking comfortably — trails, morning runs, grandkids — plus bright clinic rooms; no graphic foot close-ups, no surgical imagery, no clipboard-doctor stock. Tone: plain English, respectful, direct, for someone who has lived with foot pain for months and finally wants it looked at.
+Colors: deep navy (#1E3A5F), soft off-white (#F9FAFB), calm sky blue (#BFDBFE) accents, charcoal (#1F2933) text. Swap for any brand colors in BUSINESS DETAILS. Typography: confident serif headlines, clean sans body. Imagery: people walking comfortably (trails, morning runs, grandkids) plus bright clinic rooms; no graphic foot close-ups, no surgical imagery, no clipboard-doctor stock. Tone: plain English, respectful, direct, for someone who has lived with foot pain for months and finally wants it looked at.
 
 BUILD 6 PAGES:
 
@@ -397,12 +397,12 @@ Quiz/quote lead pipeline: New Leads, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Fitness Bootcamp": `Build a complete multi-page website for the group fitness bootcamp described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[BOOTCAMP NAME]", "[CLASS TIMES]", "[$XX/month]") — never fabricate a real-looking number, name, or review. The entire site funnels to one action: booking a FREE TRIAL CLASS.
+  "Fitness Bootcamp": `Build a complete multi-page website for the group fitness bootcamp described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[BOOTCAMP NAME]", "[CLASS TIMES]", "[$XX/month]"). Never fabricate a real-looking number, name, or review. The entire site funnels to one action: booking a FREE TRIAL CLASS.
 
-The site must feel premium and custom, never templated: modern, energetic but clean, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a fun, sweaty crew that will cheer you through your first class - and every one after.
+The site must feel premium and custom, never templated: modern, energetic but clean, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a fun, sweaty crew that will cheer you through your first class - and every one after.
 
 BRAND
-Colors: near-black charcoal (#18181B), bright off-white (#FAFAFA), high-energy coral red (#E11D48) accents, warm gray (#52525B) text — swap for any brand colors in BUSINESS DETAILS. Typography: bold athletic sans headlines, clean sans body. Imagery: real class moments — huddles, partners laughing mid-burpee, sunrise high-fives, all body types visible; no perfect-makeup stock models, no dungeon-gym shots, no "no pain no gain" cliches. Tone: upbeat, welcoming, playful, zero intimidation, for someone nervous they will be the least fit person in the room.
+Colors: near-black charcoal (#18181B), bright off-white (#FAFAFA), high-energy coral red (#E11D48) accents, warm gray (#52525B) text. Swap for any brand colors in BUSINESS DETAILS. Typography: bold athletic sans headlines, clean sans body. Imagery: real class moments: huddles, partners laughing mid-burpee, sunrise high-fives, all body types visible; no perfect-makeup stock models, no dungeon-gym shots, no "no pain no gain" cliches. Tone: upbeat, welcoming, playful, zero intimidation, for someone nervous they will be the least fit person in the room.
 
 BUILD 6 PAGES:
 
@@ -476,14 +476,14 @@ Quiz/quote lead pipeline: New Leads, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Healing": `Build a complete multi-page website for the holistic healing and wellness studio described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[STUDIO NAME]", "[PRACTITIONER NAME]", "[$XX per session]") — never fabricate a real-looking number, name, or review.
+  "Healing": `Build a complete multi-page website for the holistic healing and wellness studio described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[STUDIO NAME]", "[PRACTITIONER NAME]", "[$XX per session]"). Never fabricate a real-looking number, name, or review.
 
-The site must feel premium and custom, never templated: modern, quiet, warm, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a quiet, grounded space where you can finally exhale.
+The site must feel premium and custom, never templated: modern, quiet, warm, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a quiet, grounded space where you can finally exhale.
 
-TONE AND CLAIMS: grounded, not mystical. No medical claims — the studio does not diagnose, treat, or cure anything, and copy never promises health outcomes. Describe services through rest, relaxation, and how guests say they feel, noting experiences vary and the studio complements, never replaces, medical care.
+TONE AND CLAIMS: grounded, not mystical. No medical claims. The studio does not diagnose, treat, or cure anything, and copy never promises health outcomes. Describe services through rest, relaxation, and how guests say they feel, noting experiences vary and the studio complements, never replaces, medical care.
 
 BRAND
-Colors: warm clay (#B08968), soft sand (#F5EFE6), deep moss (#3F4A3C) accents and text, muted cream (#FDFBF7) cards — swap for any brand colors in BUSINESS DETAILS. Typography: graceful serif headlines, light airy sans body. Imagery: natural light, linen textures, sauna steam, plants and wood; no galaxy gradients, no glowing chakra diagrams, no mountaintop-meditation stock. Tone: calm, warm, unpretentious, for someone stressed and skeptical who just wants to feel like themselves again.
+Colors: warm clay (#B08968), soft sand (#F5EFE6), deep moss (#3F4A3C) accents and text, muted cream (#FDFBF7) cards. Swap for any brand colors in BUSINESS DETAILS. Typography: graceful serif headlines, light airy sans body. Imagery: natural light, linen textures, sauna steam, plants and wood; no galaxy gradients, no glowing chakra diagrams, no mountaintop-meditation stock. Tone: calm, warm, unpretentious, for someone stressed and skeptical who just wants to feel like themselves again.
 
 BUILD 6 PAGES:
 
@@ -556,12 +556,12 @@ Quiz/quote lead pipeline: New Leads, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Mixed Martial Arts Gym": `Build a complete multi-page website for the mixed martial arts gym described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[GYM NAME]", "[HEAD COACH]", "[$XXX/month]") — never fabricate a real-looking number, name, or review. The entire site funnels to one action: starting a FREE TRIAL WEEK.
+  "Mixed Martial Arts Gym": `Build a complete multi-page website for the mixed martial arts gym described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[GYM NAME]", "[HEAD COACH]", "[$XXX/month]"). Never fabricate a real-looking number, name, or review. The entire site funnels to one action: starting a FREE TRIAL WEEK.
 
-The site must feel premium and custom, never templated: modern, strong, disciplined, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a serious gym with a welcoming door - beginners and kids train here every day.
+The site must feel premium and custom, never templated: modern, strong, disciplined, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: a serious gym with a welcoming door - beginners and kids train here every day.
 
 BRAND
-Colors: near-black (#0B0B0D), clean off-white (#F8F8F7), deep crimson (#B91C1C) accents, steel gray (#4B5563) text — swap for any brand colors in BUSINESS DETAILS. Typography: strong angular sans headlines, clean sans body. Imagery: real training — technique drilling, coaches teaching kids stance, fist bumps after a roll, parents watching; no bloody cage-fight stock, no snarling close-ups, no skull graphics. Tone: confident, respectful, welcoming, for two readers at once — a nervous adult beginner and a parent judging if this is safe for their kid.
+Colors: near-black (#0B0B0D), clean off-white (#F8F8F7), deep crimson (#B91C1C) accents, steel gray (#4B5563) text. Swap for any brand colors in BUSINESS DETAILS. Typography: strong angular sans headlines, clean sans body. Imagery: real training: technique drilling, coaches teaching kids stance, fist bumps after a roll, parents watching; no bloody cage-fight stock, no snarling close-ups, no skull graphics. Tone: confident, respectful, welcoming, for two readers at once: a nervous adult beginner and a parent judging if this is safe for their kid.
 
 BUILD 6 PAGES:
 
@@ -634,12 +634,12 @@ Quiz/quote lead pipeline: New Leads, stage "Quiz/Quote Lead"
 Brand colors: use the palette above
 Logo available?: no - create a simple clean wordmark`,
 
-  "Family Fun": `Build a complete multi-page website for the family entertainment center described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[CENTER NAME]", "[PARTY PACKAGE PRICE]", "[ATTRACTION LIST]") — never fabricate a real-looking number, name, or review. Visitors are always "guests" - never patients or clients. The site funnels to two actions: booking a birthday party and planning a visit.
+  "Family Fun": `Build a complete multi-page website for the family entertainment center described in the BUSINESS DETAILS section at the end of this prompt. Use those details everywhere; never invent facts. If a detail is missing, still build everything with clearly marked placeholders (for example "[CENTER NAME]", "[PARTY PACKAGE PRICE]", "[ATTRACTION LIST]"). Never fabricate a real-looking number, name, or review. Visitors are always "guests" - never patients or clients. The site funnels to two actions: booking a birthday party and planning a visit.
 
-The site must feel premium and custom, never templated: modern, bright, joyful but organized, generous white space, subtle animation only — gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: the easiest great day out your family will have this year.
+The site must feel premium and custom, never templated: modern, bright, joyful but organized, generous white space, subtle animation only: gentle fade-up per section (once), hover lift, count-up stats, smooth page and quiz transitions, never busy. The feeling is: the easiest great day out your family will have this year.
 
 BRAND
-Colors: bright blue (#2563EB), clean white (#FFFFFF), sunny yellow (#FDE047) accents, playful magenta (#DB2777) highlights, deep navy (#1E293B) text — swap for any brand colors in BUSINESS DETAILS. Typography: friendly rounded display headlines, readable sans body. Imagery: real families mid-laugh, kids celebrating, arcade glow, birthday cake moments; no sterile empty-venue shots, no clip-art balloons, no thumbs-up stock kids. Tone: warm, playful, effortless, for a busy parent who wants zero hassle and no hidden costs.
+Colors: bright blue (#2563EB), clean white (#FFFFFF), sunny yellow (#FDE047) accents, playful magenta (#DB2777) highlights, deep navy (#1E293B) text. Swap for any brand colors in BUSINESS DETAILS. Typography: friendly rounded display headlines, readable sans body. Imagery: real families mid-laugh, kids celebrating, arcade glow, birthday cake moments; no sterile empty-venue shots, no clip-art balloons, no thumbs-up stock kids. Tone: warm, playful, effortless, for a busy parent who wants zero hassle and no hidden costs.
 
 BUILD 6 PAGES:
 

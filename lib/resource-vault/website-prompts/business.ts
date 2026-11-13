@@ -1,4 +1,4 @@
-// Website prompts — Business (generated from the dental master template)
+// Website prompts: Business (generated from the dental master template)
 export const BUSINESS_PROMPTS: Record<string, string> = {
   "Small Business (Direct Import)": `Build a complete multi-page website for the local business described in the BUSINESS DETAILS section at the very end of this prompt. The BUSINESS DETAILS section defines what kind of business this is - use those details everywhere and adapt every page, headline, and service name to that business type. Do not invent facts that are not listed there. If a detail is missing or the section is left entirely blank, still build the full site exactly as specified - just use clearly marked placeholders (for example "[BUSINESS NAME]", "[4.8 stars - 200+ reviews]", "[$XXX-$XXX]", "[OWNER NAME]") so every placeholder is easy to find and swap later. Never fabricate a real-looking number, name, or review to fill a gap.
 
